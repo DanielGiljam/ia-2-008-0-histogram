@@ -4,7 +4,11 @@ import {breakpoint as bp} from "./constants"
 import enhanceResponsiveHeader from "./enhanceResponsiveHeader"
 
 function createTheme (theme: Theme): Theme {
-  const bpMediaQuery = theme.breakpoints.up(bp)
+  const maxWidth = theme.breakpoints.values[bp]
+  const minHeight = maxWidth * 0.75
+  const bpMediaQuery = `${theme.breakpoints.up(
+    bp,
+  )} and (min-height: ${minHeight}px)`
   const {toolbarCompensation, MuiAppBar, MuiToolbar} = enhanceResponsiveHeader(
     theme,
     bpMediaQuery,
@@ -18,7 +22,7 @@ function createTheme (theme: Theme): Theme {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          [theme.breakpoints.up(bp)]: {
+          [bpMediaQuery]: {
             paddingLeft: theme.spacing(3),
             paddingRight: theme.spacing(3),
           },
@@ -32,10 +36,10 @@ function createTheme (theme: Theme): Theme {
           height: "100%",
           justifyContent: "inherit",
           width: "100%",
-          [theme.breakpoints.up(bp)]: {
+          [bpMediaQuery]: {
             height: "unset",
-            minHeight: theme.breakpoints.values[bp] * 0.75,
-            maxWidth: theme.breakpoints.values[bp],
+            minHeight,
+            maxWidth,
           },
         },
         main: {
