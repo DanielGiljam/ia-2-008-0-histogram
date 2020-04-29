@@ -1,0 +1,43 @@
+{
+  "name": "ia-2-008-0-histogram",
+  "version": "0.0.0",
+  "description": "A web app that displays a histogram for a photo.",
+  "homepage": "https://github.com/DanielGiljam/ia-2-008-0-histogram#readme",
+  "bugs": "https://github.com/DanielGiljam/ia-2-008-0-histogram/issues",
+  "license": "MIT",
+  "private": true,
+  "author": "Daniel Giljam (https://github.com/DanielGiljam)",
+  "contributors": [
+    "Ivan Akkuratov (https://github.com/jojowoodo)"
+  ],
+  "repository": "github:DanielGiljam/ia-2-008-0-histogram",
+  "scripts": {
+    "dev": "next dev",
+    "check": "tsc",
+    "lint": "eslint \"{src,pages}/**/*.{js,jsx,ts,tsx}\"",
+    "format": "prettier-eslint --write \"${PWD}/{src,pages}/**/*.{js,jsx,ts,tsx,css,sass,scss,json}\"",
+    "clf": "npm run check && npm run lint && npm run format"
+  },
+  "devDependencies": {
+    "@material-ui/core": "^4.9.12",
+    "@types/node": "^13.13.4",
+    "@types/react": "^16.9.34",
+    "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-standard": "^4.0.1",
+    "next": "^9.3.6",
+    "prettier": "^2.0.5",
+    "prettier-eslint": "^9.0.1",
+    "prettier-eslint-cli": "^5.0.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {}
+}
