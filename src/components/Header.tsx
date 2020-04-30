@@ -18,7 +18,7 @@ function Header (): JSX.Element {
           name={"description"}
         />
       </Head>
-      <AppBar elevation={0}>
+      <AppBar>
         <Toolbar>
           <Typography component={"h1"} variant={"h6"} noWrap>
             <NextLink href={{pathname: "/"}} passHref>

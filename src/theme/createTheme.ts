@@ -70,6 +70,16 @@ function createTheme (theme: Theme): Theme {
       ...MuiToolbar,
     },
   }
+  theme.props = {
+    MuiAppBar: {
+      elevation: 0,
+      variant: "elevation",
+    },
+    MuiPaper: {
+      square: true,
+      variant: "outlined",
+    },
+  }
   return theme
 }
 
