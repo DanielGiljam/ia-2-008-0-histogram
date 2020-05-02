@@ -25,6 +25,7 @@
     "@types/react": "^16.9.34",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
     "@typescript-eslint/parser": "^2.30.0",
+    "@xstate/react": "^0.8.1",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.20.2",
@@ -39,7 +40,8 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-dropzone": "^11.0.1",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "xstate": "^4.9.1"
   },
   "dependencies": {}
 }

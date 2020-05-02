@@ -1,4 +1,6 @@
-import {useCallback, useEffect, useState} from "react"
+import {useEffect} from "react"
+
+import {useMachine} from "@xstate/react"
 
 import Paper from "@material-ui/core/Paper"
 import Typography from "@material-ui/core/Typography"
@@ -10,6 +12,7 @@ import clsx from "clsx"
 
 import {useDropzone} from "react-dropzone"
 
+import pictureLoaderMachine from "../src/stateMachine"
 import {breakpoint as bp} from "../src/theme/constants"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -68,82 +71,31 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 )
 
-let fileReader: FileReader
-let image: HTMLImageElement
-
-function onDropAccepted ([picture]: File[]): void {
-  fileReader.readAsDataURL(picture)
-}
-
-function fileReaderOnLoad (event: ProgressEvent<FileReader>): void {
-  image.src = event.target.result.toString()
-}
-
+// TODO: display snackbar when there are error messages
 function Index (): JSX.Element {
-  const [imageData, setImageData] = useState<ImageData | undefined>()
   const styles = useStyles()
-  const onDropRejected = useCallback((rejects) => {
-    // TODO: display in UI when files are rejected
-    console.log("[onDropRejected]: Following files were rejected:", rejects)
-  }, [])
-  const imageOnLoad = useCallback(() => {
-    const paper = document.getElementById("paper")
-    const canvas = document.getElementById("canvas") as HTMLCanvasElement
-    const paperRect = paper.getBoundingClientRect()
-    const canvasContext2D = canvas.getContext("2d")
-    canvasContext2D.drawImage(image, 0, 0)
-    const imageData = canvasContext2D.getImageData(
-      0,
-      0,
-      image.width,
-      image.height,
-    )
-    // TODO: resize canvas when document resizes
-    const maxWidth = paperRect.width - 2
-    const maxHeight = paperRect.height - 2
-    let width = image.width
-    let height = image.height
-    if (width > height) {
-      if (width > maxWidth) {
-        height *= maxWidth / width
-        width = maxWidth
-      }
-    } else {
-      if (height > maxHeight) {
-        width *= maxHeight / height
-        height = maxHeight
-      }
-    }
-    canvas.width = width
-    canvas.height = height
-    canvasContext2D.drawImage(image, 0, 0, width, height)
-    setImageData(imageData)
-  }, [])
-  useEffect(() => {
-    fileReader = new FileReader()
-    image = new Image()
-    fileReader.addEventListener("load", fileReaderOnLoad)
-    image.addEventListener("load", imageOnLoad)
-    return (): void => {
-      fileReader.removeEventListener("load", fileReaderOnLoad)
-      image.removeEventListener("load", imageOnLoad)
-    }
-  }, [])
+  const [current, send] = useMachine(pictureLoaderMachine)
   const {getRootProps, getInputProps, isDragActive} = useDropzone({
     accept: "image/*",
     multiple: false,
-    onDropAccepted,
-    onDropRejected,
+    onDropAccepted: ([picture]) => send({type: "ACCEPT", picture}),
+    onDropRejected: (fileRejections) => send({type: "REJECT", fileRejections}),
     preventDropOnDocument: true,
   })
+  useEffect(() => {
+    send(isDragActive ? "DRAGOVER_START" : "DRAGOVER_END")
+  }, [isDragActive])
   return (
     <Paper
-      className={clsx(styles.paper, isDragActive && styles.paperDragActive)}
+      className={clsx(
+        styles.paper,
+        current.matches("dropzone.dragover") && styles.paperDragActive,
+      )}
       id={"paper"}
       {...getRootProps()}
     >
       <input {...getInputProps()} />
-      <canvas hidden={!imageData} id={"canvas"}></canvas>
+      <canvas hidden={!current.context.imageData} id={"canvas"}></canvas>
       <InsertPhotoRoundedIcon color={"action"} fontSize={"large"} />
       <Typography
         align={"center"}
@@ -152,7 +104,7 @@ function Index (): JSX.Element {
         noWrap
       >
         Drag and drop a picture
-        {isDragActive ? undefined : (
+        {current.matches("dropzone.dragover") ? undefined : (
           <>
             <br />
             or click to load a picture manually

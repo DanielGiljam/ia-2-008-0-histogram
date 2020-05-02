@@ -32,6 +32,7 @@ module.exports = {
         pathGroups: [
           {pattern: "react", group: "external", position: "before"},
           {pattern: "next{,/**}", group: "external", position: "before"},
+          {pattern: "{,@}xstate{,/**}", group: "external", position: "before"},
           {
             pattern: "{,react-,next-}i18next",
             group: "external",
