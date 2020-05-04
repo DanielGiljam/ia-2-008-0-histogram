@@ -1,12 +1,9 @@
-import {SyntheticEvent, useEffect} from "react"
+import {useEffect} from "react"
 
 import {useMachine} from "@xstate/react"
 
-import IconButton from "@material-ui/core/IconButton"
 import Paper from "@material-ui/core/Paper"
-import Snackbar from "@material-ui/core/Snackbar"
 import Typography from "@material-ui/core/Typography"
-import CloseIcon from "@material-ui/icons/Close"
 import InsertPhotoRoundedIcon from "@material-ui/icons/InsertPhotoRounded"
 
 import {Theme, createStyles, makeStyles} from "@material-ui/core/styles"
@@ -15,6 +12,7 @@ import clsx from "clsx"
 
 import {useDropzone} from "react-dropzone"
 
+import ErrorMessageSnackbar from "../src/components/ErrorMessageSnackbar"
 import stateMachine from "../src/stateMachine"
 import {breakpoint as bp} from "../src/theme/constants"
 
@@ -74,8 +72,6 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 )
 
-const errorMessageSnackbarAutoHideDuration = 6000
-
 function Index (): JSX.Element {
   const styles = useStyles()
   const [state, send] = useMachine(stateMachine)
@@ -89,13 +85,6 @@ function Index (): JSX.Element {
   useEffect(() => {
     send(isDragActive ? "DRAGOVER_START" : "DRAGOVER_END")
   }, [isDragActive])
-  function close (
-    _event: SyntheticEvent<Element, Event>,
-    reason?: string,
-  ): void {
-    if (reason === "clickaway") return
-    send("CLEAR_ERROR_MESSAGE")
-  }
   return (
     <>
       <Paper
@@ -124,27 +113,14 @@ function Index (): JSX.Element {
           )}
         </Typography>
       </Paper>
-      <Snackbar
-        action={
-          <IconButton
-            aria-label={"close"}
-            color={"inherit"}
-            size={"small"}
-            onClick={close}
-          >
-            <CloseIcon fontSize={"small"} />
-          </IconButton>
-        }
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        autoHideDuration={errorMessageSnackbarAutoHideDuration}
+      <ErrorMessageSnackbar
+        isShown={!!state.context.errorMessage}
         message={
           state.context.errorMessage || state.history?.context.errorMessage
         }
-        open={!!state.context.errorMessage}
-        onClose={close}
+        onHide={(): void => {
+          send("CLEAR_ERROR_MESSAGE")
+        }}
       />
     </>
   )
