@@ -6,20 +6,20 @@ import listeners from "./listeners"
 
 // #region ACTION IMPLEMENTATIONS
 
-const loadPicture: ActionFunction<PictureLoaderContext, AcceptEvent> = (
+const loadPicture: ActionFunction<StateMachineContext, AcceptEvent> = (
   {fileReader},
   {picture},
 ) => {
   console.log(
-    "[pictureLoader.actions]: [loadPicture]: Reading picture as data URL...",
+    "[stateMachine.actions]: [loadPicture]: Reading picture as data URL...",
   )
   fileReader.readAsDataURL(picture)
 }
 
-const setErrorMessage = assign<PictureLoaderContext, RejectEvent>({
+const setErrorMessage = assign<StateMachineContext, RejectEvent>({
   errorMessage: (_context, {fileRejections}) => {
     console.log(
-      "[pictureLoader.actions]: [setErrorMessage]: Creating error message...",
+      "[stateMachine.actions]: [setErrorMessage]: Creating error message...",
     )
     return fileRejections.length > 1
       ? "Cannot load multiple files."
@@ -27,20 +27,18 @@ const setErrorMessage = assign<PictureLoaderContext, RejectEvent>({
   },
 })
 
-const clearErrorMessage = assign<PictureLoaderContext, RejectEvent>({
+const clearErrorMessage = assign<StateMachineContext, RejectEvent>({
   errorMessage: () => {
     console.log(
-      "[pictureLoader.actions]: [clearErrorMessage]: Clearing error message...",
+      "[stateMachine.actions]: [clearErrorMessage]: Clearing error message...",
     )
     return undefined
   },
 })
 
-const setImageData = assign<PictureLoaderContext, PictureLoadedEvent>({
+const setImageData = assign<StateMachineContext, PictureLoadedEvent>({
   imageData: (_context, {imageData}) => {
-    console.log(
-      "[pictureLoader.actions]: [setImageData]: Setting image data...",
-    )
+    console.log("[stateMachine.actions]: [setImageData]: Setting image data...")
     return imageData
   },
 })
@@ -49,14 +47,14 @@ const setImageData = assign<PictureLoaderContext, PictureLoadedEvent>({
 
 // #region TYPES
 
-export interface PictureLoaderContext {
+export interface StateMachineContext {
   fileReader?: FileReader;
   image?: HTMLImageElement;
   imageData?: ImageData;
   errorMessage?: string;
 }
 
-export interface PictureLoaderSchema {
+export interface StateMachineSchema {
   type: "parallel";
   states: {
     dropzone: {
@@ -99,7 +97,7 @@ interface PictureLoadedEvent extends EventObject {
 
 // #endregion
 
-export type PictureLoaderEvent =
+export type StateMachineEvent =
   | DragoverEvent
   | AcceptEvent
   | RejectEvent
@@ -108,13 +106,13 @@ export type PictureLoaderEvent =
 
 // #endregion
 
-const pictureLoaderMachine = Machine<
-  PictureLoaderContext,
-  PictureLoaderSchema,
-  PictureLoaderEvent
+const stateMachine = Machine<
+  StateMachineContext,
+  StateMachineSchema,
+  StateMachineEvent
 >(
   {
-    id: "pictureLoader",
+    id: "stateMachine",
     type: "parallel",
     context: {
       fileReader:
@@ -152,7 +150,10 @@ const pictureLoaderMachine = Machine<
     on: {
       DRAGOVER_START: ".dropzone.dragover",
       ACCEPT: {target: ".pictureLoader.processing", actions: "loadPicture"},
-      REJECT: {target: ".pictureLoader.idle", actions: "setErrorMessage"},
+      REJECT: {
+        target: ".pictureLoader.idle",
+        actions: "setErrorMessage",
+      },
       CLEAR_ERROR_MESSAGE: {actions: "clearErrorMessage"},
     },
     invoke: {
@@ -170,4 +171,4 @@ const pictureLoaderMachine = Machine<
   },
 )
 
-export default pictureLoaderMachine
+export default stateMachine

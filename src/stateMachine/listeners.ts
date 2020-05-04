@@ -1,6 +1,6 @@
 import {InvokeCreator, Sender} from "xstate"
 
-import {PictureLoaderContext, PictureLoaderEvent} from "./index"
+import {StateMachineContext, StateMachineEvent} from "./index"
 
 function fileReaderOnLoad (
   image: HTMLImageElement,
@@ -12,12 +12,10 @@ function fileReaderOnLoad (
 
 function imageOnLoad (
   image: HTMLImageElement,
-  send: Sender<PictureLoaderEvent>,
+  send: Sender<StateMachineEvent>,
 ): void {
   console.log("[Image]: Extracting image data...")
-  const paper = document.getElementById("paper")
   const canvas = document.getElementById("canvas") as HTMLCanvasElement
-  const paperRect = paper.getBoundingClientRect()
   const canvasContext2D = canvas.getContext("2d")
   canvasContext2D.drawImage(image, 0, 0)
   send({
@@ -25,6 +23,8 @@ function imageOnLoad (
     imageData: canvasContext2D.getImageData(0, 0, image.width, image.height),
   })
   // TODO: resize canvas when document resizes
+  const paper = document.getElementById("paper")
+  const paperRect = paper.getBoundingClientRect()
   const maxWidth = paperRect.width - 2
   const maxHeight = paperRect.height - 2
   let width = image.width
@@ -45,19 +45,19 @@ function imageOnLoad (
   canvasContext2D.drawImage(image, 0, 0, width, height)
 }
 
-const listeners: InvokeCreator<PictureLoaderContext, PictureLoaderEvent> = ({
+const listeners: InvokeCreator<StateMachineContext, StateMachineEvent> = ({
   fileReader,
   image,
 }) => (callback): (() => void) | void => {
   if (fileReader && image) {
-    console.log("[pictureLoader.activities]: [listeners]: Adding listeners...")
+    console.log("[stateMachine.activities]: [listeners]: Adding listeners...")
     fileReader.addEventListener("load", (event) =>
       fileReaderOnLoad(image, event),
     )
     image.addEventListener("load", () => imageOnLoad(image, callback))
     return (): void => {
       console.log(
-        "[pictureLoader.activities]: [listeners]: Removing listeners...",
+        "[stateMachine.activities]: [listeners]: Removing listeners...",
       )
       fileReader.removeEventListener("load", (event) =>
         fileReaderOnLoad(image, event),
@@ -66,7 +66,7 @@ const listeners: InvokeCreator<PictureLoaderContext, PictureLoaderEvent> = ({
     }
   }
   console.log(
-    "[pictureLoader.activities]: [listeners]: Unable to add listeners to FileReader and Image because they are not defined. (This log message should only be displayed in non-browser environments.)",
+    "[stateMachine.activities]: [listeners]: Unable to add listeners to FileReader and Image because they are not defined. (This log message should only be displayed in non-browser environments.)",
   )
 }
 

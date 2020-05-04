@@ -15,7 +15,7 @@ import clsx from "clsx"
 
 import {useDropzone} from "react-dropzone"
 
-import pictureLoaderMachine from "../src/stateMachine"
+import stateMachine from "../src/stateMachine"
 import {breakpoint as bp} from "../src/theme/constants"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -78,7 +78,7 @@ const errorMessageSnackbarAutoHideDuration = 6000
 
 function Index (): JSX.Element {
   const styles = useStyles()
-  const [current, send] = useMachine(pictureLoaderMachine)
+  const [state, send] = useMachine(stateMachine)
   const {getRootProps, getInputProps, isDragActive} = useDropzone({
     accept: "image/*",
     multiple: false,
@@ -101,13 +101,13 @@ function Index (): JSX.Element {
       <Paper
         className={clsx(
           styles.paper,
-          current.matches("dropzone.dragover") && styles.paperDragActive,
+          state.matches("dropzone.dragover") && styles.paperDragActive,
         )}
         id={"paper"}
         {...getRootProps()}
       >
         <input {...getInputProps()} />
-        <canvas hidden={!current.context.imageData} id={"canvas"}></canvas>
+        <canvas hidden={!state.context.imageData} id={"canvas"}></canvas>
         <InsertPhotoRoundedIcon color={"action"} fontSize={"large"} />
         <Typography
           align={"center"}
@@ -116,7 +116,7 @@ function Index (): JSX.Element {
           noWrap
         >
           Drag and drop a picture
-          {current.matches("dropzone.dragover") ? undefined : (
+          {state.matches("dropzone.dragover") ? undefined : (
             <>
               <br />
               or click to load a picture manually
@@ -141,9 +141,9 @@ function Index (): JSX.Element {
         }}
         autoHideDuration={errorMessageSnackbarAutoHideDuration}
         message={
-          current.context.errorMessage || current.history?.context.errorMessage
+          state.context.errorMessage || state.history?.context.errorMessage
         }
-        open={!!current.context.errorMessage}
+        open={!!state.context.errorMessage}
         onClose={close}
       />
     </>
