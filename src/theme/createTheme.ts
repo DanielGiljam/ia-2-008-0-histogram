@@ -79,6 +79,9 @@ function createTheme (theme: Theme): Theme {
       square: true,
       variant: "outlined",
     },
+    MuiSnackbarContent: {
+      variant: "elevation",
+    },
   }
   return theme
 }

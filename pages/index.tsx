@@ -1,9 +1,12 @@
-import {useEffect} from "react"
+import {SyntheticEvent, useEffect} from "react"
 
 import {useMachine} from "@xstate/react"
 
+import IconButton from "@material-ui/core/IconButton"
 import Paper from "@material-ui/core/Paper"
+import Snackbar from "@material-ui/core/Snackbar"
 import Typography from "@material-ui/core/Typography"
+import CloseIcon from "@material-ui/icons/Close"
 import InsertPhotoRoundedIcon from "@material-ui/icons/InsertPhotoRounded"
 
 import {Theme, createStyles, makeStyles} from "@material-ui/core/styles"
@@ -71,7 +74,8 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 )
 
-// TODO: display snackbar when there are error messages
+const errorMessageSnackbarAutoHideDuration = 6000
+
 function Index (): JSX.Element {
   const styles = useStyles()
   const [current, send] = useMachine(pictureLoaderMachine)
@@ -85,33 +89,64 @@ function Index (): JSX.Element {
   useEffect(() => {
     send(isDragActive ? "DRAGOVER_START" : "DRAGOVER_END")
   }, [isDragActive])
+  function close (
+    _event: SyntheticEvent<Element, Event>,
+    reason?: string,
+  ): void {
+    if (reason === "clickaway") return
+    send("CLEAR_ERROR_MESSAGE")
+  }
   return (
-    <Paper
-      className={clsx(
-        styles.paper,
-        current.matches("dropzone.dragover") && styles.paperDragActive,
-      )}
-      id={"paper"}
-      {...getRootProps()}
-    >
-      <input {...getInputProps()} />
-      <canvas hidden={!current.context.imageData} id={"canvas"}></canvas>
-      <InsertPhotoRoundedIcon color={"action"} fontSize={"large"} />
-      <Typography
-        align={"center"}
-        color={"textSecondary"}
-        component={"span"}
-        noWrap
-      >
-        Drag and drop a picture
-        {current.matches("dropzone.dragover") ? undefined : (
-          <>
-            <br />
-            or click to load a picture manually
-          </>
+    <>
+      <Paper
+        className={clsx(
+          styles.paper,
+          current.matches("dropzone.dragover") && styles.paperDragActive,
         )}
-      </Typography>
-    </Paper>
+        id={"paper"}
+        {...getRootProps()}
+      >
+        <input {...getInputProps()} />
+        <canvas hidden={!current.context.imageData} id={"canvas"}></canvas>
+        <InsertPhotoRoundedIcon color={"action"} fontSize={"large"} />
+        <Typography
+          align={"center"}
+          color={"textSecondary"}
+          component={"span"}
+          noWrap
+        >
+          Drag and drop a picture
+          {current.matches("dropzone.dragover") ? undefined : (
+            <>
+              <br />
+              or click to load a picture manually
+            </>
+          )}
+        </Typography>
+      </Paper>
+      <Snackbar
+        action={
+          <IconButton
+            aria-label={"close"}
+            color={"inherit"}
+            size={"small"}
+            onClick={close}
+          >
+            <CloseIcon fontSize={"small"} />
+          </IconButton>
+        }
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        autoHideDuration={errorMessageSnackbarAutoHideDuration}
+        message={
+          current.context.errorMessage || current.history?.context.errorMessage
+        }
+        open={!!current.context.errorMessage}
+        onClose={close}
+      />
+    </>
   )
 }
 

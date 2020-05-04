@@ -16,24 +16,23 @@ const loadPicture: ActionFunction<PictureLoaderContext, AcceptEvent> = (
   fileReader.readAsDataURL(picture)
 }
 
-const setErrorMessages = assign<PictureLoaderContext, RejectEvent>({
-  errorMessages: ({errorMessages}, {fileRejections}) => {
+const setErrorMessage = assign<PictureLoaderContext, RejectEvent>({
+  errorMessage: (_context, {fileRejections}) => {
     console.log(
-      "[pictureLoader.actions]: [setErrorMessages]: Creating error messages...",
+      "[pictureLoader.actions]: [setErrorMessage]: Creating error message...",
     )
-    return [
-      ...errorMessages,
-      ...fileRejections.map(
-        ({file, errors}) =>
-          `File name: "${file.name}", ${
-            errors.length > 1
-              ? `reasons: ${errors
-                  .map(({message}) => `"${message}"`)
-                  .join(", ")}`
-              : `reason: "${errors[0].message}"`
-          }`,
-      ),
-    ]
+    return fileRejections.length > 1
+      ? "Cannot load multiple files."
+      : "File must be an image."
+  },
+})
+
+const clearErrorMessage = assign<PictureLoaderContext, RejectEvent>({
+  errorMessage: () => {
+    console.log(
+      "[pictureLoader.actions]: [clearErrorMessage]: Clearing error message...",
+    )
+    return undefined
   },
 })
 
@@ -54,7 +53,7 @@ export interface PictureLoaderContext {
   fileReader?: FileReader;
   image?: HTMLImageElement;
   imageData?: ImageData;
-  errorMessages: string[];
+  errorMessage?: string;
 }
 
 export interface PictureLoaderSchema {
@@ -90,6 +89,9 @@ interface RejectEvent extends EventObject {
   type: "REJECT";
   fileRejections: FileRejection[];
 }
+interface ClearErrorMessageEvent extends EventObject {
+  type: "CLEAR_ERROR_MESSAGE";
+}
 interface PictureLoadedEvent extends EventObject {
   type: "PICTURE_LOADED";
   imageData: ImageData;
@@ -101,6 +103,7 @@ export type PictureLoaderEvent =
   | DragoverEvent
   | AcceptEvent
   | RejectEvent
+  | ClearErrorMessageEvent
   | PictureLoadedEvent
 
 // #endregion
@@ -118,7 +121,7 @@ const pictureLoaderMachine = Machine<
         typeof FileReader !== "undefined" ? new FileReader() : undefined,
       image: typeof Image !== "undefined" ? new Image() : undefined,
       imageData: undefined,
-      errorMessages: [],
+      errorMessage: undefined,
     },
     states: {
       dropzone: {
@@ -149,7 +152,8 @@ const pictureLoaderMachine = Machine<
     on: {
       DRAGOVER_START: ".dropzone.dragover",
       ACCEPT: {target: ".pictureLoader.processing", actions: "loadPicture"},
-      REJECT: {target: ".pictureLoader.idle", actions: "setErrorMessages"},
+      REJECT: {target: ".pictureLoader.idle", actions: "setErrorMessage"},
+      CLEAR_ERROR_MESSAGE: {actions: "clearErrorMessage"},
     },
     invoke: {
       id: "listeners",
@@ -159,7 +163,8 @@ const pictureLoaderMachine = Machine<
   {
     actions: {
       loadPicture,
-      setErrorMessages,
+      setErrorMessage,
+      clearErrorMessage,
       setImageData,
     },
   },
