@@ -2,6 +2,7 @@ import {useEffect} from "react"
 
 import {useMachine} from "@xstate/react"
 
+import Button from "@material-ui/core/Button"
 import Typography from "@material-ui/core/Typography"
 import InsertPhotoRoundedIcon from "@material-ui/icons/InsertPhotoRounded"
 
@@ -13,11 +14,14 @@ import {useDropzone} from "react-dropzone"
 
 import ErrorMessageSnackbar from "../src/components/ErrorMessageSnackbar"
 import stateMachine from "../src/stateMachine"
-import {breakpoint as bp} from "../src/theme/constants"
+import {
+  inputLabelButtonHeight as bh,
+  breakpoint as bp,
+} from "../src/theme/constants"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    paper: {
+    div: {
       alignItems: "center",
       backgroundColor: theme.palette.grey[100],
       border: `1px solid ${theme.palette.divider}`,
@@ -27,26 +31,28 @@ const useStyles = makeStyles((theme: Theme) =>
       height: "100%",
       maxHeight: theme.breakpoints.values[bp] * 0.3,
       maxWidth: theme.breakpoints.values[bp] * 0.4,
-      padding: theme.spacing(2),
+      transition: theme.transitions.create("background-color"),
+      userSelect: "none",
       width: "100%",
       "& > canvas": {
         position: "absolute",
+        transition: theme.transitions.create("opacity"),
       },
       "&:hover": {
-        backgroundColor: theme.palette.grey[200],
-        cursor: "pointer",
         "& > canvas": {
           opacity: theme.palette.action.focusOpacity,
-          transition: theme.transitions.create("opacity"),
         },
         "& > :not(canvas)": {
           zIndex: 1,
         },
       },
     },
-    paperDragover: {
-      backgroundColor: theme.palette.grey[200],
+    divDragover: {
+      border: `4px solid ${theme.palette.divider}`,
       cursor: "copy",
+      "&.$divImageData": {
+        backgroundColor: theme.palette.grey[100],
+      },
       "& > svg": {
         animation: `${
           theme.transitions.duration.complex * 2
@@ -55,16 +61,29 @@ const useStyles = makeStyles((theme: Theme) =>
       },
       "& > canvas": {
         opacity: theme.palette.action.focusOpacity,
-        transition: theme.transitions.create("opacity"),
       },
       "& > :not(canvas)": {
         zIndex: 1,
       },
     },
-    paperImageData: {
+    divImageData: {
+      backgroundColor: "unset",
+      backgroundImage: `linear-gradient(45deg, ${theme.palette.grey[100]} 25%, transparent 25%), linear-gradient(-45deg, ${theme.palette.grey[100]} 25%, transparent 25%), linear-gradient(45deg, transparent 75%, ${theme.palette.grey[100]} 75%), linear-gradient(-45deg, transparent 75%, ${theme.palette.grey[100]} 75%)`,
+      backgroundSize: "20px 20px",
+      backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0px",
       border: "unset",
+      justifySelf: "start",
       maxHeight: "unset",
       maxWidth: "unset",
+      "&:hover": {
+        backgroundColor: theme.palette.grey[100],
+      },
+    },
+    button: {
+      height: bh,
+      marginBottom: -bh,
+      position: "relative",
+      top: bh / -2,
     },
     "@keyframes iconDragActiveAnimation": {
       from: {
@@ -77,12 +96,15 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 )
 
+// TODO: use onDrop instead of onDropAccepted and onDropRejected
 function Index (): JSX.Element {
   const styles = useStyles()
   const [state, send] = useMachine(stateMachine)
   const {getRootProps, getInputProps, isDragActive} = useDropzone({
     accept: "image/*",
     multiple: false,
+    noClick: true,
+    noKeyboard: true,
     onDropAccepted: ([picture]) => send({type: "ACCEPT", picture}),
     onDropRejected: (fileRejections) => send({type: "REJECT", fileRejections}),
     preventDropOnDocument: true,
@@ -94,14 +116,14 @@ function Index (): JSX.Element {
     <>
       <div
         className={clsx(
-          styles.paper,
-          state.matches("dropzone.dragover") && styles.paperDragover,
-          state.context.imageData && styles.paperImageData,
+          styles.div,
+          state.matches("dropzone.dragover") && styles.divDragover,
+          state.context.imageData && styles.divImageData,
         )}
         id={"picturePreview"}
         {...getRootProps()}
       >
-        <input {...getInputProps()} />
+        <input id={"input"} {...getInputProps()} />
         <canvas hidden={!state.context.imageData} id={"canvas"}></canvas>
         <InsertPhotoRoundedIcon color={"action"} fontSize={"large"} />
         <Typography
@@ -111,14 +133,19 @@ function Index (): JSX.Element {
           noWrap
         >
           Drag and drop a picture
-          {state.matches("dropzone.dragover") ? undefined : (
-            <>
-              <br />
-              or click to load a picture manually
-            </>
-          )}
         </Typography>
       </div>
+      <Button
+        className={styles.button}
+        color={"primary"}
+        component={"label"}
+        htmlFor={"input"}
+        variant={"contained"}
+      >
+        {state.context.imageData
+          ? "Load a picture"
+          : "Or load a picture manually"}
+      </Button>
       <ErrorMessageSnackbar
         isShown={!!state.context.errorMessage}
         message={

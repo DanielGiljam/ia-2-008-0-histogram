@@ -1,12 +1,14 @@
 function calculatePicturePreviewSize (
   image: HTMLImageElement,
-  width: number,
-  height: number,
-  maxWidth: number,
-  maxHeight: number,
   canvas: HTMLCanvasElement,
-  canvasContext2D: CanvasRenderingContext2D,
 ): void {
+  const picturePreview = document.getElementById("picturePreview")
+  picturePreview.style.height = ""
+  let {width, height} = image
+  const {
+    width: maxWidth,
+    height: maxHeight,
+  } = picturePreview.getBoundingClientRect()
   if (width > height) {
     if (width > maxWidth) {
       height *= maxWidth / width
@@ -28,7 +30,8 @@ function calculatePicturePreviewSize (
   }
   canvas.width = width
   canvas.height = height
-  canvasContext2D.drawImage(image, 0, 0, width, height)
+  picturePreview.style.height = height + "px"
+  canvas.getContext("2d").drawImage(image, 0, 0, width, height)
 }
 
 export default calculatePicturePreviewSize

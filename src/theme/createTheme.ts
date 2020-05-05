@@ -13,6 +13,7 @@ function createTheme (theme: Theme): Theme {
     theme,
     bpMediaQuery,
   )
+  const mainBorder = `1px solid ${theme.palette.divider}`
   theme.overrides = {
     MuiCssBaseline: {
       "@global": {
@@ -52,10 +53,9 @@ function createTheme (theme: Theme): Theme {
           ...toolbarCompensation,
           [bpMediaQuery]: {
             ...(toolbarCompensation[bpMediaQuery] as object),
-            border:
-              theme.palette.type === "light"
-                ? `1px solid ${theme.palette.divider}`
-                : undefined,
+            borderBottom: mainBorder,
+            borderLeft: mainBorder,
+            borderRight: mainBorder,
           },
         },
       },

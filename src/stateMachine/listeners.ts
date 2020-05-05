@@ -19,45 +19,20 @@ function imageOnLoad (
   console.log("[Image]: Extracting image data...")
   const canvas = document.getElementById("canvas") as HTMLCanvasElement
   const canvasContext2D = canvas.getContext("2d")
-  const {width, height} = image
   canvasContext2D.drawImage(image, 0, 0)
   send({
     type: "PICTURE_LOADED",
-    imageData: canvasContext2D.getImageData(0, 0, width, height),
+    imageData: canvasContext2D.getImageData(0, 0, image.width, image.height),
   })
-  const {width: maxWidth, height: maxHeight} = document
-    .getElementById("picturePreview")
-    .getBoundingClientRect()
   console.log("[Image]: Calculating picture preview size...")
-  calculatePicturePreviewSize(
-    image,
-    width,
-    height,
-    maxWidth,
-    maxHeight,
-    canvas,
-    canvasContext2D,
-  )
+  calculatePicturePreviewSize(image, canvas)
 }
 
 function windowOnResize (image: HTMLImageElement): void {
-  const {width, height} = image
-  if (!width || !height) return
-  const {width: maxWidth, height: maxHeight} = document
-    .getElementById("picturePreview")
-    .getBoundingClientRect()
+  if (!image.width || !image.height) return
   const canvas = document.getElementById("canvas") as HTMLCanvasElement
-  const canvasContext2D = canvas.getContext("2d")
   console.log("[window.onresize]: Calculating picture preview size...")
-  calculatePicturePreviewSize(
-    image,
-    width,
-    height,
-    maxWidth,
-    maxHeight,
-    canvas,
-    canvasContext2D,
-  )
+  calculatePicturePreviewSize(image, canvas)
 }
 
 const listeners: InvokeCreator<StateMachineContext, StateMachineEvent> = ({
