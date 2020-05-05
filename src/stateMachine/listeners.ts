@@ -1,5 +1,7 @@
 import {InvokeCreator, Sender} from "xstate"
 
+import calculatePicturePreviewSize from "../util/calculatePicturePreviewSize"
+
 import {StateMachineContext, StateMachineEvent} from "./index"
 
 function fileReaderOnLoad (
@@ -17,32 +19,45 @@ function imageOnLoad (
   console.log("[Image]: Extracting image data...")
   const canvas = document.getElementById("canvas") as HTMLCanvasElement
   const canvasContext2D = canvas.getContext("2d")
+  const {width, height} = image
   canvasContext2D.drawImage(image, 0, 0)
   send({
     type: "PICTURE_LOADED",
-    imageData: canvasContext2D.getImageData(0, 0, image.width, image.height),
+    imageData: canvasContext2D.getImageData(0, 0, width, height),
   })
-  // TODO: resize canvas when document resizes
-  const paper = document.getElementById("paper")
-  const paperRect = paper.getBoundingClientRect()
-  const maxWidth = paperRect.width - 2
-  const maxHeight = paperRect.height - 2
-  let width = image.width
-  let height = image.height
-  if (width > height) {
-    if (width > maxWidth) {
-      height *= maxWidth / width
-      width = maxWidth
-    }
-  } else {
-    if (height > maxHeight) {
-      width *= maxHeight / height
-      height = maxHeight
-    }
-  }
-  canvas.width = width
-  canvas.height = height
-  canvasContext2D.drawImage(image, 0, 0, width, height)
+  const {width: maxWidth, height: maxHeight} = document
+    .getElementById("picturePreview")
+    .getBoundingClientRect()
+  console.log("[Image]: Calculating picture preview size...")
+  calculatePicturePreviewSize(
+    image,
+    width,
+    height,
+    maxWidth,
+    maxHeight,
+    canvas,
+    canvasContext2D,
+  )
+}
+
+function windowOnResize (image: HTMLImageElement): void {
+  const {width, height} = image
+  if (!width || !height) return
+  const {width: maxWidth, height: maxHeight} = document
+    .getElementById("picturePreview")
+    .getBoundingClientRect()
+  const canvas = document.getElementById("canvas") as HTMLCanvasElement
+  const canvasContext2D = canvas.getContext("2d")
+  console.log("[window.onresize]: Calculating picture preview size...")
+  calculatePicturePreviewSize(
+    image,
+    width,
+    height,
+    maxWidth,
+    maxHeight,
+    canvas,
+    canvasContext2D,
+  )
 }
 
 const listeners: InvokeCreator<StateMachineContext, StateMachineEvent> = ({
@@ -55,6 +70,7 @@ const listeners: InvokeCreator<StateMachineContext, StateMachineEvent> = ({
       fileReaderOnLoad(image, event),
     )
     image.addEventListener("load", () => imageOnLoad(image, callback))
+    window.addEventListener("resize", () => windowOnResize(image))
     return (): void => {
       console.log(
         "[stateMachine.activities]: [listeners]: Removing listeners...",
@@ -63,6 +79,7 @@ const listeners: InvokeCreator<StateMachineContext, StateMachineEvent> = ({
         fileReaderOnLoad(image, event),
       )
       image.removeEventListener("load", () => imageOnLoad(image, callback))
+      window.removeEventListener("resize", () => windowOnResize(image))
     }
   }
   console.log(

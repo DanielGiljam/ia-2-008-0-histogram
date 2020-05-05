@@ -2,7 +2,6 @@ import {useEffect} from "react"
 
 import {useMachine} from "@xstate/react"
 
-import Paper from "@material-ui/core/Paper"
 import Typography from "@material-ui/core/Typography"
 import InsertPhotoRoundedIcon from "@material-ui/icons/InsertPhotoRounded"
 
@@ -21,6 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
     paper: {
       alignItems: "center",
       backgroundColor: theme.palette.grey[100],
+      border: `1px solid ${theme.palette.divider}`,
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
       },
     },
-    paperDragActive: {
+    paperDragover: {
       backgroundColor: theme.palette.grey[200],
       cursor: "copy",
       "& > svg": {
@@ -60,6 +60,11 @@ const useStyles = makeStyles((theme: Theme) =>
       "& > :not(canvas)": {
         zIndex: 1,
       },
+    },
+    paperImageData: {
+      border: "unset",
+      maxHeight: "unset",
+      maxWidth: "unset",
     },
     "@keyframes iconDragActiveAnimation": {
       from: {
@@ -87,12 +92,13 @@ function Index (): JSX.Element {
   }, [isDragActive])
   return (
     <>
-      <Paper
+      <div
         className={clsx(
           styles.paper,
-          state.matches("dropzone.dragover") && styles.paperDragActive,
+          state.matches("dropzone.dragover") && styles.paperDragover,
+          state.context.imageData && styles.paperImageData,
         )}
-        id={"paper"}
+        id={"picturePreview"}
         {...getRootProps()}
       >
         <input {...getInputProps()} />
@@ -112,7 +118,7 @@ function Index (): JSX.Element {
             </>
           )}
         </Typography>
-      </Paper>
+      </div>
       <ErrorMessageSnackbar
         isShown={!!state.context.errorMessage}
         message={

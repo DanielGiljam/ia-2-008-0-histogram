@@ -9,7 +9,6 @@ const toolbarLandscapeMediaQuery =
   "@media (min-width:0px) and (orientation: landscape)"
 const toolbarUndenseBreakpoint: keyof BreakpointValues = "sm"
 const toolbarDefaultPaddingMultiplier = 2
-const toolbarUndensePaddingMultiplier = 3
 
 function enhanceResponsiveHeader (
   theme: Theme,
@@ -29,27 +28,17 @@ function enhanceResponsiveHeader (
     toolbarUndenseMediaQuery
   ] as {minHeight: number}).minHeight
   const toolbarDefaultPadding = theme.spacing(toolbarDefaultPaddingMultiplier)
-  const toolbarUndensePadding = theme.spacing(toolbarUndensePaddingMultiplier)
   return {
     toolbarCompensation: {
       marginTop: theme.mixins.toolbar.minHeight,
-      paddingBottom: toolbarDefaultPadding,
-      paddingLeft: toolbarDefaultPadding,
-      paddingRight: toolbarDefaultPadding,
       [toolbarLandscapeMediaQuery]: {
         marginTop: toolbarDenseHeight,
       },
       [toolbarUndenseMediaQuery]: {
         marginTop: toolbarUndenseHeight,
-        paddingBottom: toolbarUndensePadding,
-        paddingLeft: toolbarUndensePadding,
-        paddingRight: toolbarUndensePadding,
       },
       [breakpointMediaQuery]: {
         marginTop: "unset",
-        paddingBottom: toolbarDefaultPadding,
-        paddingLeft: toolbarDefaultPadding,
-        paddingRight: toolbarDefaultPadding,
       },
     },
     MuiAppBar: {
