@@ -1,17 +1,21 @@
 import {Theme} from "@material-ui/core/styles"
 
-import {breakpoint as bp} from "./constants"
+import {
+  breakpoint,
+  defaultSvgIconFontSize,
+  largeSvgIconFontSize,
+} from "./constants"
 import enhanceResponsiveHeader from "./enhanceResponsiveHeader"
 
 function createTheme (theme: Theme): Theme {
-  const maxWidth = theme.breakpoints.values[bp]
+  const maxWidth = theme.breakpoints.values[breakpoint]
   const minHeight = maxWidth * 0.75
-  const bpMediaQuery = `${theme.breakpoints.up(
-    bp,
+  const breakpointMediaQuery = `${theme.breakpoints.up(
+    breakpoint,
   )} and (min-height: ${minHeight}px)`
   const {toolbarCompensation, MuiAppBar, MuiToolbar} = enhanceResponsiveHeader(
     theme,
-    bpMediaQuery,
+    breakpointMediaQuery,
   )
   const mainBorder = `1px solid ${theme.palette.divider}`
   theme.overrides = {
@@ -23,21 +27,19 @@ function createTheme (theme: Theme): Theme {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          [bpMediaQuery]: {
+          [breakpointMediaQuery]: {
             paddingLeft: theme.spacing(3),
             paddingRight: theme.spacing(3),
           },
         },
         "#__next": {
           alignItems: "inherit",
-          backgroundColor: theme.palette.background.paper,
-          border: "unset",
           display: "inherit",
           flexDirection: "inherit",
           height: "100%",
           justifyContent: "inherit",
           width: "100%",
-          [bpMediaQuery]: {
+          [breakpointMediaQuery]: {
             height: "unset",
             minHeight,
             maxWidth,
@@ -45,14 +47,15 @@ function createTheme (theme: Theme): Theme {
         },
         main: {
           alignItems: "inherit",
+          background: theme.palette.background.paper,
           display: "inherit",
           flexDirection: "inherit",
           height: "100%",
           "justify-content": "inherit",
           width: "100%",
           ...toolbarCompensation,
-          [bpMediaQuery]: {
-            ...(toolbarCompensation[bpMediaQuery] as object),
+          [breakpointMediaQuery]: {
+            ...(toolbarCompensation[breakpointMediaQuery] as object),
             borderBottom: mainBorder,
             borderLeft: mainBorder,
             borderRight: mainBorder,
@@ -68,6 +71,14 @@ function createTheme (theme: Theme): Theme {
         justifyContent: "space-between",
       },
       ...MuiToolbar,
+    },
+    MuiSvgIcon: {
+      root: {
+        fontSize: largeSvgIconFontSize,
+        [breakpointMediaQuery]: {
+          fontSize: defaultSvgIconFontSize,
+        },
+      },
     },
   }
   theme.props = {
