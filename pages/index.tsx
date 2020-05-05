@@ -96,7 +96,6 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 )
 
-// TODO: use onDrop instead of onDropAccepted and onDropRejected
 function Index (): JSX.Element {
   const styles = useStyles()
   const [state, send] = useMachine(stateMachine)
@@ -105,8 +104,8 @@ function Index (): JSX.Element {
     multiple: false,
     noClick: true,
     noKeyboard: true,
-    onDropAccepted: ([picture]) => send({type: "ACCEPT", picture}),
-    onDropRejected: (fileRejections) => send({type: "REJECT", fileRejections}),
+    onDrop: (acceptedFiles, fileRejections) =>
+      send({type: "FILES", acceptedFiles, fileRejections}),
     preventDropOnDocument: true,
   })
   useEffect(() => {
