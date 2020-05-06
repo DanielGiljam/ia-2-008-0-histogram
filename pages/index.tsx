@@ -146,7 +146,7 @@ function Index (): JSX.Element {
         {...getRootProps()}
       >
         <input id={"input"} {...getInputProps()} />
-        <canvas hidden={!state.context.imageData} id={"canvas"}></canvas>
+        <canvas hidden={!state.context.imageData} id={"canvas"} />
         <InsertPhotoRoundedIcon color={"action"} fontSize={"large"} />
         <Typography
           align={"center"}
