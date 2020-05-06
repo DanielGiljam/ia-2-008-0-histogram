@@ -1,10 +1,6 @@
 import {Theme} from "@material-ui/core/styles"
 
-import {
-  breakpoint,
-  defaultSvgIconFontSize,
-  largeSvgIconFontSize,
-} from "./constants"
+import {breakpoint} from "./constants"
 import enhanceResponsiveHeader from "./enhanceResponsiveHeader"
 
 function createTheme (theme: Theme): Theme {
@@ -26,10 +22,10 @@ function createTheme (theme: Theme): Theme {
           alignItems: "center",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
           [breakpointMediaQuery]: {
             paddingLeft: theme.spacing(3),
             paddingRight: theme.spacing(3),
+            justifyContent: "center",
           },
         },
         "#__next": {
@@ -37,12 +33,12 @@ function createTheme (theme: Theme): Theme {
           display: "inherit",
           flexDirection: "inherit",
           height: "100%",
-          justifyContent: "inherit",
           width: "100%",
           [breakpointMediaQuery]: {
             height: "unset",
             minHeight,
             maxWidth,
+            justifyContent: "inherit",
           },
         },
         main: {
@@ -51,7 +47,6 @@ function createTheme (theme: Theme): Theme {
           display: "inherit",
           flexDirection: "inherit",
           height: "100%",
-          "justify-content": "inherit",
           width: "100%",
           ...toolbarCompensation,
           [breakpointMediaQuery]: {
@@ -59,6 +54,7 @@ function createTheme (theme: Theme): Theme {
             borderBottom: mainBorder,
             borderLeft: mainBorder,
             borderRight: mainBorder,
+            justifyContent: "inherit",
           },
         },
       },
@@ -71,14 +67,6 @@ function createTheme (theme: Theme): Theme {
         justifyContent: "space-between",
       },
       ...MuiToolbar,
-    },
-    MuiSvgIcon: {
-      root: {
-        fontSize: largeSvgIconFontSize,
-        [breakpointMediaQuery]: {
-          fontSize: defaultSvgIconFontSize,
-        },
-      },
     },
   }
   theme.props = {

@@ -22,6 +22,9 @@ import fetchPicture from "../test/fetchPicture"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    mainImageData: {
+      padding: "unset",
+    },
     div: {
       alignItems: "center",
       backgroundColor: theme.palette.grey[100],
@@ -30,6 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: "column",
       justifyContent: "center",
       height: "100%",
+      minHeight: theme.breakpoints.values[bp] * 0.3,
       maxHeight: theme.breakpoints.values[bp] * 0.3,
       maxWidth: theme.breakpoints.values[bp] * 0.4,
       transition: theme.transitions.create("background-color"),
@@ -128,7 +132,9 @@ function Index (): JSX.Element {
     send(isDragActive ? "DRAGOVER_START" : "DRAGOVER_END")
   }, [isDragActive])
   return (
-    <>
+    <main
+      className={state.context.imageData ? styles.mainImageData : undefined}
+    >
       <div
         className={clsx(
           styles.div,
@@ -170,7 +176,7 @@ function Index (): JSX.Element {
           send("CLEAR_ERROR_MESSAGE")
         }}
       />
-    </>
+    </main>
   )
 }
 
