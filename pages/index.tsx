@@ -13,6 +13,7 @@ import clsx from "clsx"
 import {useDropzone} from "react-dropzone"
 
 import ErrorMessageSnackbar from "../src/components/ErrorMessageSnackbar"
+import Histogram from "../src/components/Histogram"
 import stateMachine from "../src/stateMachine"
 import {
   inputLabelButtonHeight as bh,
@@ -168,6 +169,7 @@ function Index (): JSX.Element {
           ? "Load a picture"
           : "Or load a picture manually"}
       </Button>
+      {state.context.imageData ? <Histogram /> : undefined}
       <ErrorMessageSnackbar
         isShown={!!state.context.errorMessage}
         message={
