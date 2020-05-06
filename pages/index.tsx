@@ -18,6 +18,7 @@ import {
   inputLabelButtonHeight as bh,
   breakpoint as bp,
 } from "../src/theme/constants"
+import fetchPicture from "../test/fetchPicture"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -108,6 +109,12 @@ function Index (): JSX.Element {
       send({type: "FILES", acceptedFiles, fileRejections}),
     preventDropOnDocument: true,
   })
+  useEffect(() => {
+    // REMOVE BEFORE PRODUCTION!
+    fetchPicture().then((picture) =>
+      send({type: "FILES", acceptedFiles: [picture], fileRejections: []}),
+    )
+  }, [])
   useEffect(() => {
     send(isDragActive ? "DRAGOVER_START" : "DRAGOVER_END")
   }, [isDragActive])
