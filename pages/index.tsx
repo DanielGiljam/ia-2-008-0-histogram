@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     div: {
       alignItems: "center",
+      backgroundAttachment: "fixed",
       backgroundColor: theme.palette.grey[100],
       border: `1px solid ${theme.palette.divider}`,
       display: "flex",
