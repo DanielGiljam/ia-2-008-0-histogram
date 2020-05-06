@@ -37,6 +37,8 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       "& > canvas": {
         position: "absolute",
+      },
+      "& > *": {
         transition: theme.transitions.create("opacity"),
       },
       "&:hover": {
@@ -64,6 +66,7 @@ const useStyles = makeStyles((theme: Theme) =>
         opacity: theme.palette.action.focusOpacity,
       },
       "& > :not(canvas)": {
+        opacity: 1,
         zIndex: 1,
       },
     },
@@ -76,8 +79,14 @@ const useStyles = makeStyles((theme: Theme) =>
       justifySelf: "start",
       maxHeight: "unset",
       maxWidth: "unset",
+      "& > :not(canvas)": {
+        opacity: 0,
+      },
       "&:hover": {
         backgroundColor: theme.palette.grey[100],
+        "& > :not(canvas)": {
+          opacity: 1,
+        },
       },
     },
     button: {
