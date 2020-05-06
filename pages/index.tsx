@@ -1,5 +1,8 @@
 function Index(): JSX.Element {
-  return <div>Hello Histogram!!</div>
+  return <div>
+    <h1>Bildens pixelfördelning</h1>
+
+  </div>
 
 }
 
