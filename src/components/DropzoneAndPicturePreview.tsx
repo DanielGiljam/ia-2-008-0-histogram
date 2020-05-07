@@ -2,6 +2,7 @@ import {useEffect} from "react"
 
 import {Interpreter, State} from "xstate"
 
+import CircularProgress from "@material-ui/core/CircularProgress"
 import Typography from "@material-ui/core/Typography"
 import InsertPhotoRoundedIcon from "@material-ui/icons/InsertPhotoRounded"
 
@@ -138,15 +139,24 @@ function DropzoneAndPicturePreview ({
     >
       <input id={"input"} {...getInputProps()} />
       <canvas hidden={!state.context.imageData} id={"canvas"} />
-      <InsertPhotoRoundedIcon color={"action"} fontSize={"large"} />
-      <Typography
-        align={"center"}
-        color={"textSecondary"}
-        component={"span"}
-        noWrap
-      >
-        Drag and drop a picture
-      </Typography>
+      {state.matches("pictureLoader.processing") ? (
+        <CircularProgress
+          value={state.context.loadingProgress}
+          variant={"determinate"}
+        />
+      ) : (
+        <>
+          <InsertPhotoRoundedIcon color={"action"} fontSize={"large"} />
+          <Typography
+            align={"center"}
+            color={"textSecondary"}
+            component={"span"}
+            noWrap
+          >
+            Drag and drop a picture
+          </Typography>
+        </>
+      )}
     </div>
   )
 }

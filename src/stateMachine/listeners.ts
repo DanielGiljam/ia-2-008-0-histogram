@@ -4,18 +4,56 @@ import calculatePicturePreviewSize from "../util/calculatePicturePreviewSize"
 
 import {StateMachineContext, StateMachineEvent} from "./index"
 
-function fileReaderOnLoad (
-  image: HTMLImageElement,
+function fileReaderOnLoadStart (send: Sender<StateMachineEvent>): void {
+  send({type: "LOADING_PROGRESS", loadingProgress: 0})
+}
+
+function fileReaderOnProgress (
+  send: Sender<StateMachineEvent>,
   event: ProgressEvent<FileReader>,
 ): void {
+  send({
+    type: "LOADING_PROGRESS",
+    loadingProgress: (event.loaded / (event.total * 2)) * 100,
+  })
+}
+
+function fileReaderOnError (send: Sender<StateMachineEvent>): void {
+  send({type: "LOADING_ERROR", from: "FileReader"})
+}
+
+function fileReaderOnLoad (
+  image: HTMLImageElement,
+  send: Sender<StateMachineEvent>,
+  event: ProgressEvent<FileReader>,
+): void {
+  send({
+    type: "LOADING_PROGRESS",
+    loadingProgress: 50,
+  })
   console.log("[Image]: Loading image...")
   image.src = event.target.result.toString()
+}
+
+function imageOnProgress (
+  send: Sender<StateMachineEvent>,
+  event: ProgressEvent<EventTarget>,
+): void {
+  send({
+    type: "LOADING_PROGRESS",
+    loadingProgress: ((event.total + event.loaded) / (event.total * 2)) * 100,
+  })
+}
+
+function imageOnError (send: Sender<StateMachineEvent>): void {
+  send({type: "LOADING_ERROR", from: "Image"})
 }
 
 function imageOnLoad (
   image: HTMLImageElement,
   send: Sender<StateMachineEvent>,
 ): void {
+  send({type: "LOADING_PROGRESS", loadingProgress: 100})
   console.log("[Image]: Extracting image data...")
   const canvas = document.getElementById("canvas") as HTMLCanvasElement
   const canvasContext2D = canvas.getContext("2d")
@@ -41,18 +79,40 @@ const listeners: InvokeCreator<StateMachineContext, StateMachineEvent> = ({
 }) => (callback): (() => void) | void => {
   if (fileReader && image) {
     console.log("[stateMachine.activities]: [listeners]: Adding listeners...")
-    fileReader.addEventListener("load", (event) =>
-      fileReaderOnLoad(image, event),
+    fileReader.addEventListener("loadstart", () =>
+      fileReaderOnLoadStart(callback),
     )
+    fileReader.addEventListener("progress", (event) =>
+      fileReaderOnProgress(callback, event),
+    )
+    fileReader.addEventListener("error", () => fileReaderOnError(callback))
+    fileReader.addEventListener("load", (event) =>
+      fileReaderOnLoad(image, callback, event),
+    )
+    image.addEventListener("progress", (event) =>
+      imageOnProgress(callback, event),
+    )
+    image.addEventListener("error", () => imageOnError(callback))
     image.addEventListener("load", () => imageOnLoad(image, callback))
     window.addEventListener("resize", () => windowOnResize(image))
     return (): void => {
       console.log(
         "[stateMachine.activities]: [listeners]: Removing listeners...",
       )
-      fileReader.removeEventListener("load", (event) =>
-        fileReaderOnLoad(image, event),
+      fileReader.removeEventListener("loadstart", () =>
+        fileReaderOnLoadStart(callback),
       )
+      fileReader.removeEventListener("progress", (event) =>
+        fileReaderOnProgress(callback, event),
+      )
+      fileReader.removeEventListener("error", () => fileReaderOnError(callback))
+      fileReader.removeEventListener("load", (event) =>
+        fileReaderOnLoad(image, callback, event),
+      )
+      image.removeEventListener("progress", (event) =>
+        imageOnProgress(callback, event),
+      )
+      image.removeEventListener("error", () => imageOnError(callback))
       image.removeEventListener("load", () => imageOnLoad(image, callback))
       window.removeEventListener("resize", () => windowOnResize(image))
     }

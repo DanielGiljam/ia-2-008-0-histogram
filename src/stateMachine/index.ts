@@ -31,14 +31,30 @@ const loadPicture: ActionFunction<StateMachineContext, FilesEvent> = (
   fileReader.readAsDataURL(file)
 }
 
-const setErrorMessage = assign<StateMachineContext, FilesEvent>({
-  errorMessage: (_context, {fileRejections}) => {
+const setLoadingProgress = assign<StateMachineContext, LoadingProgressEvent>({
+  loadingProgress: (_context, {loadingProgress}) => loadingProgress,
+})
+
+const setErrorMessage = assign<
+  StateMachineContext,
+  FilesEvent | LoadingErrorEvent
+>({
+  errorMessage: ({fileReader}, {type, ...event}) => {
     console.log(
-      "[stateMachine.actions]: [setErrorMessage]: Creating error message...",
+      "[stateMachine.actions]: [setErrorMessage]: Setting error message...",
     )
-    return fileRejections.length > 1
-      ? "Cannot load multiple files."
-      : "File must be an image."
+    if (type === "FILES") {
+      return (event as FilesEvent).fileRejections.length > 1
+        ? "Cannot load multiple files."
+        : "File must be an image."
+    } else {
+      if ((event as LoadingErrorEvent).from === "FileReader") {
+        fileReader.abort()
+        return "Encountered an error while reading file."
+      } else {
+        return "Encountered an error while loading image."
+      }
+    }
   },
 })
 
@@ -66,6 +82,7 @@ export interface StateMachineContext {
   fileReader?: FileReader;
   image?: HTMLImageElement;
   imageData?: ImageData;
+  loadingProgress?: number;
   errorMessage?: string;
 }
 
@@ -99,6 +116,14 @@ interface FilesEvent extends EventObject {
   acceptedFiles: File[];
   fileRejections: FileRejection[];
 }
+interface LoadingProgressEvent extends EventObject {
+  type: "LOADING_PROGRESS";
+  loadingProgress: number;
+}
+interface LoadingErrorEvent extends EventObject {
+  type: "LOADING_ERROR";
+  from: "FileReader" | "Image";
+}
 interface ClearErrorMessageEvent extends EventObject {
   type: "CLEAR_ERROR_MESSAGE";
 }
@@ -112,6 +137,8 @@ interface PictureLoadedEvent extends EventObject {
 export type StateMachineEvent =
   | DragoverEvent
   | FilesEvent
+  | LoadingProgressEvent
+  | LoadingErrorEvent
   | ClearErrorMessageEvent
   | PictureLoadedEvent
 
@@ -130,6 +157,7 @@ const stateMachine = Machine<
         typeof FileReader !== "undefined" ? new FileReader() : undefined,
       image: typeof Image !== "undefined" ? new Image() : undefined,
       imageData: undefined,
+      loadingProgress: undefined,
       errorMessage: undefined,
     },
     states: {
@@ -152,6 +180,8 @@ const stateMachine = Machine<
           idle: {},
           processing: {
             on: {
+              LOADING_PROGRESS: {actions: "setLoadingProgress"},
+              LOADING_ERROR: {target: "idle", actions: "setErrorMessage"},
               PICTURE_LOADED: {target: "idle", actions: "setImageData"},
             },
           },
@@ -181,6 +211,7 @@ const stateMachine = Machine<
     },
     actions: {
       loadPicture,
+      setLoadingProgress,
       setErrorMessage,
       clearErrorMessage,
       setImageData,
