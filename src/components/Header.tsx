@@ -5,6 +5,7 @@ import AppBar from "@material-ui/core/AppBar"
 import MuiLink from "@material-ui/core/Link"
 import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
+import Index from "../../pages"
 
 export type Anchor = (EventTarget & HTMLButtonElement) | undefined
 
@@ -24,6 +25,7 @@ function Header(): JSX.Element {
             <NextLink href={{ pathname: "/" }} passHref>
               <MuiLink color={"inherit"} underline={"none"}>
                 IA-2-008 (0) Histogram
+               
               </MuiLink>
             </NextLink>
           </Typography>
