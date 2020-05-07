@@ -8,7 +8,7 @@ import Typography from "@material-ui/core/Typography"
 
 export type Anchor = (EventTarget & HTMLButtonElement) | undefined
 
-function Header (): JSX.Element {
+function Header(): JSX.Element {
   return (
     <>
       <Head>
@@ -21,7 +21,7 @@ function Header (): JSX.Element {
       <AppBar elevation={0}>
         <Toolbar>
           <Typography component={"h1"} variant={"h6"} noWrap>
-            <NextLink href={{pathname: "/"}} passHref>
+            <NextLink href={{ pathname: "/" }} passHref>
               <MuiLink color={"inherit"} underline={"none"}>
                 IA-2-008 (0) Histogram
               </MuiLink>
