@@ -1,16 +1,16 @@
-import { useEffect } from "react"
+import {useEffect} from "react"
 
-import { useMachine } from "@xstate/react"
+import {useMachine} from "@xstate/react"
 
 import Button from "@material-ui/core/Button"
 
-import { createStyles, makeStyles } from "@material-ui/core/styles"
+import {createStyles, makeStyles} from "@material-ui/core/styles"
 
 import DropzoneAndPicturePreview from "../src/components/DropzoneAndPicturePreview"
 import ErrorMessageSnackbar from "../src/components/ErrorMessageSnackbar"
 import Histogram from "../src/components/Histogram"
 import stateMachine from "../src/stateMachine"
-import { inputLabelButtonHeight as bh } from "../src/theme/constants"
+import {inputLabelButtonHeight as bh} from "../src/theme/constants"
 import fetchPicture from "../test/fetchPicture"
 
 const useStyles = makeStyles(() =>
@@ -27,13 +27,13 @@ const useStyles = makeStyles(() =>
   }),
 )
 
-function Index(): JSX.Element {
+function Index (): JSX.Element {
   const styles = useStyles()
   const [state, send] = useMachine(stateMachine)
   useEffect(() => {
     // REMOVE BEFORE PRODUCTION!
     fetchPicture().then((picture) =>
-      send({ type: "FILES", acceptedFiles: [picture], fileRejections: [] }),
+      send({type: "FILES", acceptedFiles: [picture], fileRejections: []}),
     )
   }, [])
   return (
