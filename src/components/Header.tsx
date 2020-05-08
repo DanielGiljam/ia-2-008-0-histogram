@@ -1,11 +1,12 @@
 import Head from "next/head"
-import NextLink from "next/link"
 
 import AppBar from "@material-ui/core/AppBar"
-import MuiLink from "@material-ui/core/Link"
+import IconButton from "@material-ui/core/IconButton"
 import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
-import Index from "../../pages"
+import GitHubIcon from "@material-ui/icons/GitHub"
+
+const sourceCodeURL = "https://github.com/DanielGiljam/ia-2-008-0-histogram"
 
 export type Anchor = (EventTarget & HTMLButtonElement) | undefined
 
@@ -19,16 +20,20 @@ function Header(): JSX.Element {
           name={"description"}
         />
       </Head>
-      <AppBar elevation={0}>
+      <AppBar>
         <Toolbar>
           <Typography component={"h1"} variant={"h6"} noWrap>
-            <NextLink href={{ pathname: "/" }} passHref>
-              <MuiLink color={"inherit"} underline={"none"}>
-                IA-2-008 (0) Histogram
-               
-              </MuiLink>
-            </NextLink>
+            IA-2-008 (0) Histogram
           </Typography>
+          <IconButton
+            aria-label={"Link to repository on GitHub"}
+            color={"inherit"}
+            component={"a"}
+            edge={"end"}
+            href={sourceCodeURL}
+          >
+            <GitHubIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
     </>

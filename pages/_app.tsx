@@ -27,9 +27,7 @@ function App ({Component, pageProps}: AppProps): JSX.Element {
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <CssBaseline />
       <Header />
-      <main>
-        <Component {...pageProps} />
-      </main>
+      <Component {...pageProps} />
     </ThemeProvider>
   )
 }

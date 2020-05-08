@@ -33,23 +33,17 @@ function enhanceResponsiveHeader (
   return {
     toolbarCompensation: {
       marginTop: theme.mixins.toolbar.minHeight,
-      paddingBottom: toolbarDefaultPadding,
-      paddingLeft: toolbarDefaultPadding,
-      paddingRight: toolbarDefaultPadding,
+      padding: toolbarDefaultPadding,
       [toolbarLandscapeMediaQuery]: {
         marginTop: toolbarDenseHeight,
       },
       [toolbarUndenseMediaQuery]: {
         marginTop: toolbarUndenseHeight,
-        paddingBottom: toolbarUndensePadding,
-        paddingLeft: toolbarUndensePadding,
-        paddingRight: toolbarUndensePadding,
+        padding: toolbarUndensePadding,
       },
       [breakpointMediaQuery]: {
         marginTop: "unset",
-        paddingBottom: toolbarDefaultPadding,
-        paddingLeft: toolbarDefaultPadding,
-        paddingRight: toolbarDefaultPadding,
+        padding: toolbarDefaultPadding,
       },
     },
     MuiAppBar: {

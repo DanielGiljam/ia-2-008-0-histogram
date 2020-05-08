@@ -1,14 +1,19 @@
 import {Theme} from "@material-ui/core/styles"
 
-import {breakpoint as bp} from "./constants"
+import {breakpoint} from "./constants"
 import enhanceResponsiveHeader from "./enhanceResponsiveHeader"
 
 function createTheme (theme: Theme): Theme {
-  const bpMediaQuery = theme.breakpoints.up(bp)
+  const maxWidth = theme.breakpoints.values[breakpoint]
+  const minHeight = maxWidth * 0.75
+  const breakpointMediaQuery = `${theme.breakpoints.up(
+    breakpoint,
+  )} and (min-height: ${minHeight}px)`
   const {toolbarCompensation, MuiAppBar, MuiToolbar} = enhanceResponsiveHeader(
     theme,
-    bpMediaQuery,
+    breakpointMediaQuery,
   )
+  const mainBorder = `1px solid ${theme.palette.divider}`
   theme.overrides = {
     MuiCssBaseline: {
       "@global": {
@@ -17,41 +22,39 @@ function createTheme (theme: Theme): Theme {
           alignItems: "center",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          [theme.breakpoints.up(bp)]: {
+          [breakpointMediaQuery]: {
             paddingLeft: theme.spacing(3),
             paddingRight: theme.spacing(3),
+            justifyContent: "center",
           },
         },
         "#__next": {
           alignItems: "inherit",
-          backgroundColor: theme.palette.background.paper,
-          border: "unset",
           display: "inherit",
           flexDirection: "inherit",
           height: "100%",
-          justifyContent: "inherit",
           width: "100%",
-          [theme.breakpoints.up(bp)]: {
+          [breakpointMediaQuery]: {
             height: "unset",
-            minHeight: theme.breakpoints.values[bp] * 0.75,
-            maxWidth: theme.breakpoints.values[bp],
+            minHeight,
+            maxWidth,
+            justifyContent: "inherit",
           },
         },
         main: {
           alignItems: "inherit",
+          background: theme.palette.background.paper,
           display: "inherit",
           flexDirection: "inherit",
           height: "100%",
-          "justify-content": "inherit",
           width: "100%",
           ...toolbarCompensation,
-          [bpMediaQuery]: {
-            ...(toolbarCompensation[bpMediaQuery] as object),
-            border:
-              theme.palette.type === "light"
-                ? `1px solid ${theme.palette.divider}`
-                : undefined,
+          [breakpointMediaQuery]: {
+            ...(toolbarCompensation[breakpointMediaQuery] as object),
+            borderBottom: mainBorder,
+            borderLeft: mainBorder,
+            borderRight: mainBorder,
+            justifyContent: "inherit",
           },
         },
       },
@@ -64,6 +67,19 @@ function createTheme (theme: Theme): Theme {
         justifyContent: "space-between",
       },
       ...MuiToolbar,
+    },
+  }
+  theme.props = {
+    MuiAppBar: {
+      elevation: 0,
+      variant: "elevation",
+    },
+    MuiPaper: {
+      square: true,
+      variant: "outlined",
+    },
+    MuiSnackbarContent: {
+      variant: "elevation",
     },
   }
   return theme
