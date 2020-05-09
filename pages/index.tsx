@@ -1,10 +1,16 @@
-import {useEffect} from "react"
+import React, {useEffect, useRef, useState} from "react"
 
 import {useMachine} from "@xstate/react"
 
 import Button from "@material-ui/core/Button"
 
 import {createStyles, makeStyles} from "@material-ui/core/styles"
+
+import * as d3 from "d3"
+import {max} from "d3-array"
+import {axisBottom, axisLeft} from "d3-axis"
+import {scaleBand, scaleLinear} from "d3-scale"
+import {select, selectAll} from "d3-selection"
 
 import DropzoneAndPicturePreview from "../src/components/DropzoneAndPicturePreview"
 import ErrorMessageSnackbar from "../src/components/ErrorMessageSnackbar"
@@ -50,7 +56,9 @@ function Index (): JSX.Element {
           ? "Load a picture"
           : "Or load a picture manually"}
       </Button>
-      {state.context.imageData ? <Histogram /> : undefined}
+      {state.context.imageData ? (
+        <Histogram imageData={state.context.imageData} />
+      ) : undefined}
       <ErrorMessageSnackbar
         isShown={!!state.context.errorMessage}
         message={
