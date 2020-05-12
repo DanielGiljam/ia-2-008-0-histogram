@@ -10,7 +10,7 @@ const sourceCodeURL = "https://github.com/DanielGiljam/ia-2-008-0-histogram"
 
 export type Anchor = (EventTarget & HTMLButtonElement) | undefined
 
-function Header(): JSX.Element {
+function Header (): JSX.Element {
   return (
     <>
       <Head>
