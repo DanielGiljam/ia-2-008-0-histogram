@@ -1,16 +1,10 @@
-import React, {useEffect, useRef, useState} from "react"
+import React, {useEffect} from "react"
 
 import {useMachine} from "@xstate/react"
 
 import Button from "@material-ui/core/Button"
 
 import {createStyles, makeStyles} from "@material-ui/core/styles"
-
-import * as d3 from "d3"
-import {max} from "d3-array"
-import {axisBottom, axisLeft} from "d3-axis"
-import {scaleBand, scaleLinear} from "d3-scale"
-import {select, selectAll} from "d3-selection"
 
 import DropzoneAndPicturePreview from "../src/components/DropzoneAndPicturePreview"
 import ErrorMessageSnackbar from "../src/components/ErrorMessageSnackbar"
