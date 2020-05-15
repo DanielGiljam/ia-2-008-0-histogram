@@ -56,14 +56,14 @@ function imageOnLoad (
   send({type: "LOADING_PROGRESS", loadingProgress: 100})
   console.log("[Image]: Extracting image data...")
   const canvas = document.getElementById("canvas") as HTMLCanvasElement
-  const canvasContext2D = canvas.getContext("2d")
-  canvasContext2D.drawImage(image, 0, 0)
+  calculatePicturePreviewSize(image, canvas)
   send({
     type: "PICTURE_LOADED",
-    imageData: canvasContext2D.getImageData(0, 0, image.width, image.height),
+    imageData: canvas
+      .getContext("2d")
+      .getImageData(0, 0, image.width, image.height),
   })
   console.log("[Image]: Calculating picture preview size...")
-  calculatePicturePreviewSize(image, canvas)
 }
 
 function windowOnResize (image: HTMLImageElement): void {
