@@ -1,20 +1,17 @@
-import React, {useEffect} from "react"
+import {useEffect, useState} from "react"
+
+import {CircularProgress} from "@material-ui/core"
 
 import {Theme, createStyles, makeStyles} from "@material-ui/core/styles"
+
+import {Line, LineChart, ResponsiveContainer, Tooltip, YAxis} from "recharts"
 
 import {breakpoint as bp} from "../theme/constants"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     histogram: {
-      alignItems: "center",
-      background: theme.palette.grey[300],
-      display: "flex",
-      flexDirection: "column",
       flexGrow: 1,
-      fontFamily: "monospace",
-      fontSize: "1.5rem",
-      justifyContent: "center",
       minHeight: theme.breakpoints.values[bp] * 0.2,
       padding: theme.spacing(3),
       width: "100%",
@@ -22,25 +19,21 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 )
 
-function renderHistogram (imageData: ImageData): void {
-  console.log("imageData:", imageData)
-  const histogram = document.getElementById("histogram")
-  console.log("histogram:", histogram)
-  const pixels: Pixel[] = []
-  for (let i = 0; i < imageData.data.length; i += 4) {
-    pixels.push({
-      red: imageData.data[i],
-      green: imageData.data[i + 1],
-      blue: imageData.data[i + 2],
-      alpha: imageData.data[i + 3],
+const histogramDataObjectKeys = ["red", "green", "blue", "alpha"]
+
+async function prepareData ({data}: ImageData): Promise<HistogramDataObject[]> {
+  const histogramData: HistogramDataObject[] = JSON.parse(
+    JSON.stringify(new Array(256).fill({red: 0, green: 0, blue: 0, alpha: 0})),
+  )
+  for (let i = 0; i < data.length; i += 4) {
+    histogramDataObjectKeys.forEach((key, j) => {
+      histogramData[data[i + j]][key]++
     })
   }
-  console.log("pixels:", pixels)
-  const histogramRect = histogram.getBoundingClientRect()
-  console.log("histogramRect:", histogramRect)
+  return histogramData
 }
 
-interface Pixel {
+interface HistogramDataObject {
   red: number;
   green: number;
   blue: number;
@@ -53,10 +46,39 @@ interface HistogramProps {
 
 function Histogram ({imageData}: HistogramProps): JSX.Element {
   const styles = useStyles()
-  useEffect(() => renderHistogram(imageData), [])
+  const [histogramDataArray, setHistogramDataArray] = useState<
+    HistogramDataObject[]
+  >([])
+  useEffect(() => {
+    prepareData(imageData).then((histogramDataArray) =>
+      setHistogramDataArray(histogramDataArray),
+    )
+  }, [imageData])
   return (
     <div className={styles.histogram}>
-      <svg id={"histogram"} />
+      {histogramDataArray.length ? (
+        <ResponsiveContainer>
+          <LineChart data={histogramDataArray}>
+            <YAxis
+              domain={[
+                // TODO: calculate Y-axis scale in a more sophisticated way
+                0,
+                histogramDataArray
+                  .map(({red, green, blue}) => (red + green + blue) / 3)
+                  .reduce((prevY, y) => prevY + y) / histogramDataArray.length,
+              ]}
+              allowDataOverflow
+            />
+            <Tooltip />
+            <Line dataKey={"red"} dot={false} stroke={"red"} />
+            <Line dataKey={"green"} dot={false} stroke={"green"} />
+            <Line dataKey={"blue"} dot={false} stroke={"blue"} />
+            <Line dataKey={"alpha"} dot={false} stroke={"alpha"} />
+          </LineChart>
+        </ResponsiveContainer>
+      ) : (
+        <CircularProgress />
+      )}
     </div>
   )
 }
