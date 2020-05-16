@@ -1,17 +1,25 @@
-import {useEffect, useState} from "react"
+import {useEffect} from "react"
 
-import {CircularProgress} from "@material-ui/core"
+import {useMachine} from "@xstate/react"
+
+import {CircularProgress, Typography} from "@material-ui/core"
 
 import {Theme, createStyles, makeStyles} from "@material-ui/core/styles"
 
 import {Line, LineChart, ResponsiveContainer, Tooltip, YAxis} from "recharts"
 
-import {breakpoint as bp} from "../theme/constants"
+import {breakpoint as bp} from "../../theme/constants"
+
+import histogramMachine from "./histogramMachine"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     histogram: {
+      alignItems: "center",
+      display: "flex",
+      flexDirection: "column",
       flexGrow: 1,
+      justifyContent: "center",
       minHeight: theme.breakpoints.values[bp] * 0.2,
       padding: theme.spacing(3),
       width: "100%",
@@ -19,26 +27,8 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 )
 
-const histogramDataObjectKeys = ["red", "green", "blue", "alpha"]
-
-async function prepareData ({data}: ImageData): Promise<HistogramDataObject[]> {
-  const histogramData: HistogramDataObject[] = JSON.parse(
-    JSON.stringify(new Array(256).fill({red: 0, green: 0, blue: 0, alpha: 0})),
-  )
-  for (let i = 0; i < data.length; i += 4) {
-    histogramDataObjectKeys.forEach((key, j) => {
-      histogramData[data[i + j]][key]++
-    })
-  }
-  return histogramData
-}
-
-interface HistogramDataObject {
-  red: number;
-  green: number;
-  blue: number;
-  alpha: number;
-}
+const errorMessage =
+  "Encountered unknown error when generating histogram data. See console for more information."
 
 interface HistogramProps {
   imageData?: ImageData;
@@ -46,26 +36,31 @@ interface HistogramProps {
 
 function Histogram ({imageData}: HistogramProps): JSX.Element {
   const styles = useStyles()
-  const [histogramDataArray, setHistogramDataArray] = useState<
-    HistogramDataObject[]
-  >([])
+  const [state, send] = useMachine(histogramMachine)
   useEffect(() => {
-    prepareData(imageData).then((histogramDataArray) =>
-      setHistogramDataArray(histogramDataArray),
-    )
+    if (imageData) send({type: "DATA", data: imageData.data})
   }, [imageData])
-  return (
-    <div className={styles.histogram}>
-      {histogramDataArray.length ? (
+  let contents: JSX.Element
+  switch (state.value) {
+    case "deactivated":
+      return null
+    case "loading":
+      contents = <CircularProgress disableShrink />
+      break
+    case "error":
+      contents = <Typography>{errorMessage}</Typography>
+      break
+    default:
+      contents = (
         <ResponsiveContainer>
-          <LineChart data={histogramDataArray}>
+          <LineChart data={state.context.data}>
             <YAxis
               domain={[
                 // TODO: calculate Y-axis scale in a more sophisticated way
                 0,
-                histogramDataArray
+                state.context.data
                   .map(({red, green, blue}) => (red + green + blue) / 3)
-                  .reduce((prevY, y) => prevY + y) / histogramDataArray.length,
+                  .reduce((prevY, y) => prevY + y) / state.context.data.length,
               ]}
               allowDataOverflow
             />
@@ -76,11 +71,9 @@ function Histogram ({imageData}: HistogramProps): JSX.Element {
             <Line dataKey={"alpha"} dot={false} stroke={"alpha"} />
           </LineChart>
         </ResponsiveContainer>
-      ) : (
-        <CircularProgress />
-      )}
-    </div>
-  )
+      )
+  }
+  return <div className={styles.histogram}>{contents}</div>
 }
 
 export default Histogram

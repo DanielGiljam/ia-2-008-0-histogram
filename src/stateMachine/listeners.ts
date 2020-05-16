@@ -54,7 +54,9 @@ function imageOnLoad (
   send: Sender<StateMachineEvent>,
 ): void {
   send({type: "LOADING_PROGRESS", loadingProgress: 100})
-  console.log("[Image]: Extracting image data...")
+  console.log(
+    "[Image]: Calculating picture preview size and extracting image data...",
+  )
   const canvas = document.getElementById("canvas") as HTMLCanvasElement
   calculatePicturePreviewSize(image, canvas)
   send({
@@ -63,7 +65,6 @@ function imageOnLoad (
       .getContext("2d")
       .getImageData(0, 0, image.width, image.height),
   })
-  console.log("[Image]: Calculating picture preview size...")
 }
 
 function windowOnResize (image: HTMLImageElement): void {

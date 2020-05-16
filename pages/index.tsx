@@ -50,9 +50,7 @@ function Index (): JSX.Element {
           ? "Load a picture"
           : "Or load a picture manually"}
       </Button>
-      {state.context.imageData ? (
-        <Histogram imageData={state.context.imageData} />
-      ) : undefined}
+      <Histogram imageData={state.context.imageData} />
       <ErrorMessageSnackbar
         isShown={!!state.context.errorMessage}
         message={
