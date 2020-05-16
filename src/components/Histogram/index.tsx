@@ -73,7 +73,12 @@ function Histogram ({imageData}: HistogramProps): JSX.Element {
         </ResponsiveContainer>
       )
   }
-  return <div className={styles.histogram}>{contents}</div>
+  return (
+    <div className={styles.histogram}>
+      {contents}
+      <div id={"histogram"} />
+    </div>
+  )
 }
 
 export default Histogram

@@ -11,7 +11,7 @@ import channelState, {
   ChannelStateEvent,
   ChannelStateSchema,
 } from "./channelState"
-import processData, {DataEvent} from "./processData"
+import generateHistogram, {DataEvent} from "./generateHistogram"
 
 // #region ACTION IMPLEMENTATIONS
 
@@ -97,7 +97,7 @@ const histogramMachine = Machine<
       loading: {
         invoke: {
           id: "processData",
-          src: processData,
+          src: generateHistogram,
           onDone: {target: "idle", actions: "setData"},
           onError: {target: "error", actions: "logError"},
         },

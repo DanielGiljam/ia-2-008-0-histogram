@@ -1,5 +1,7 @@
 import {EventObject, InvokeCreator} from "xstate"
 
+import drawHistogram from "./d3-isolated/drawHistogram"
+
 import {
   HistogramData,
   HistogramDataObject,
@@ -18,10 +20,10 @@ export interface DataEvent extends EventObject {
   data: Uint8ClampedArray;
 }
 
-const processData: InvokeCreator<HistogramMachineContext, DataEvent> = async (
-  _context: unknown,
-  {data}: DataEvent,
-) => {
+const generateHistogram: InvokeCreator<
+  HistogramMachineContext,
+  DataEvent
+> = async (_context: unknown, {data}: DataEvent) => {
   console.log("[processData]: Generating histogram data...")
   const histogramData: HistogramData = JSON.parse(
     JSON.stringify(new Array(256).fill(histogramDataObject)),
@@ -31,7 +33,8 @@ const processData: InvokeCreator<HistogramMachineContext, DataEvent> = async (
       histogramData[data[i + j]][key]++
     })
   }
+  drawHistogram(histogramData, "#histogram")
   return histogramData
 }
 
-export default processData
+export default generateHistogram
