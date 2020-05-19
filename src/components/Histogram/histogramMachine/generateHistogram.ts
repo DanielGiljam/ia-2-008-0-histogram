@@ -28,12 +28,13 @@ const generateHistogram: InvokeCreator<
   const histogramData: HistogramData = JSON.parse(
     JSON.stringify(new Array(256).fill(histogramDataObject)),
   )
+  const histogramDataObjectKeys = Object.keys(histogramDataObject)
   for (let i = 0; i < data.length; i += 4) {
-    Object.keys(histogramDataObject).forEach((key, j) => {
+    histogramDataObjectKeys.forEach((key, j) => {
       histogramData[data[i + j]][key]++
     })
   }
-  drawHistogram(histogramData, "#histogram")
+  drawHistogram(histogramData)
   return histogramData
 }
 

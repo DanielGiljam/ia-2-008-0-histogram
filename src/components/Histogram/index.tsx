@@ -23,6 +23,10 @@ const useStyles = makeStyles((theme: Theme) =>
       minHeight: theme.breakpoints.values[bp] * 0.2,
       padding: theme.spacing(3),
       width: "100%",
+      "& > #histogram": {
+        height: "100%",
+        width: "100%",
+      },
     },
   }),
 )
@@ -42,8 +46,6 @@ function Histogram ({imageData}: HistogramProps): JSX.Element {
   }, [imageData])
   let contents: JSX.Element
   switch (state.value) {
-    case "deactivated":
-      return null
     case "loading":
       contents = <CircularProgress disableShrink />
       break
@@ -51,27 +53,7 @@ function Histogram ({imageData}: HistogramProps): JSX.Element {
       contents = <Typography>{errorMessage}</Typography>
       break
     default:
-      contents = (
-        <ResponsiveContainer>
-          <LineChart data={state.context.data}>
-            <YAxis
-              domain={[
-                // TODO: calculate Y-axis scale in a more sophisticated way
-                0,
-                state.context.data
-                  .map(({red, green, blue}) => (red + green + blue) / 3)
-                  .reduce((prevY, y) => prevY + y) / state.context.data.length,
-              ]}
-              allowDataOverflow
-            />
-            <Tooltip />
-            <Line dataKey={"red"} dot={false} stroke={"red"} />
-            <Line dataKey={"green"} dot={false} stroke={"green"} />
-            <Line dataKey={"blue"} dot={false} stroke={"blue"} />
-            <Line dataKey={"alpha"} dot={false} stroke={"alpha"} />
-          </LineChart>
-        </ResponsiveContainer>
-      )
+      contents = undefined
   }
   return (
     <div className={styles.histogram}>
