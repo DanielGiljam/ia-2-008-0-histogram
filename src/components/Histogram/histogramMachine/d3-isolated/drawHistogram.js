@@ -1,6 +1,6 @@
 import * as d3 from "d3"
 
-function drawHistogram (data) {
+function drawHistogram (data, state) {
   console.log(data.shift())
 
   const {
