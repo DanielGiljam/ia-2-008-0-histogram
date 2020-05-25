@@ -54,17 +54,16 @@ function drawHistogram (data) {
     k++
   }
   rgbValues.push(r + g + b)
-  console.log(rgbValues)
 
   // console.log(r)
 
   // Skapar scale efter r (som är en array av data.red)
   const yScale = d3
     .scaleLinear()
-    .domain([d3.min(r), d3.max(r)])
+    .domain([d3.min(r), d3.max([d3.max(r), d3.max(g), d3.max(b)])])
     .range([height, 0])
 
-  const xScale = d3.scaleLinear().domain([0, 255]).range([0, width])
+  const xScale = d3.scaleLinear().domain([0, data.length]).range([0, width])
   // Axis
   const yAxis = d3.axisLeft(yScale)
   const xAxis = d3.axisBottom(xScale)
