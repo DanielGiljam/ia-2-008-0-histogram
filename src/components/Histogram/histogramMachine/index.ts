@@ -21,6 +21,7 @@ const setData = assign<HistogramMachineContext, DoneInvokeEvent<HistogramData>>(
       console.log(
         "[histogramMachine.actions]: [setData]: Setting histogram data...",
       )
+      // debugger
       return data
     },
   },
