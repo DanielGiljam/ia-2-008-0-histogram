@@ -29,9 +29,6 @@ function drawHistogram (data) {
     .attr("transform", `translate(${margins.left},0)`)
     .attr("style", "isolation: isolate")
 
-  // TODO: find a way to avoid doing data.shift()
-  data.shift()
-
   const r = []
   const g = []
   const b = []
@@ -46,7 +43,10 @@ function drawHistogram (data) {
 
   const yScale = d3
     .scaleLinear()
-    .domain([d3.min(l), d3.max(l)])
+    .domain([
+      d3.min([d3.min(r), d3.min(g), d3.min(b), d3.min(l)]),
+      d3.max([d3.max(r), d3.max(g), d3.max(b), d3.max(l)]),
+    ])
     .range([height, 0])
   const xScale = d3.scaleLinear().domain([0, data.length]).range([0, width])
   const area = d3

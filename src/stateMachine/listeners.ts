@@ -63,7 +63,7 @@ function imageOnLoad (
     type: "PICTURE_LOADED",
     imageData: canvas
       .getContext("2d")
-      .getImageData(0, 0, image.width, image.height),
+      .getImageData(0, 0, canvas.width, canvas.height),
   })
 }
 
