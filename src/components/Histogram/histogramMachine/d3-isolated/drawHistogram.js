@@ -73,16 +73,19 @@ function drawHistogram (data, state) {
     .attr("fill", "red")
     .style("opacity", 0.5)
     .attr("d", area(r))
+    .attr("id", "red")
   svg
     .append("path")
     .attr("fill", "green")
     .style("opacity", 0.5)
     .attr("d", area(g))
+    .attr("id", "green")
   svg
     .append("path")
     .attr("fill", "blue")
     .style("opacity", 0.5)
     .attr("d", area(b))
+    .attr("id", "blue")
 
   // rita axisarna
   svg.append("g").call(yAxis)
