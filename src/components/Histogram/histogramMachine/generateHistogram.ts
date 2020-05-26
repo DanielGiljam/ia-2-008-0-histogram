@@ -12,7 +12,7 @@ const histogramDataObject: HistogramDataObject = {
   red: 0,
   green: 0,
   blue: 0,
-  alpha: 0,
+  luminosity: 0,
 }
 
 export interface DataEvent extends EventObject {

@@ -10,6 +10,7 @@ import {
 import channelState, {
   ChannelStateEvent,
   ChannelStateSchema,
+  toggleChannel,
 } from "./channelState"
 import generateHistogram, {DataEvent} from "./generateHistogram"
 
@@ -21,7 +22,6 @@ const setData = assign<HistogramMachineContext, DoneInvokeEvent<HistogramData>>(
       console.log(
         "[histogramMachine.actions]: [setData]: Setting histogram data...",
       )
-      // debugger
       return data
     },
   },
@@ -36,7 +36,7 @@ const logError: ActionFunction<
 
 // #region TYPES
 
-export type ColorChannel = "red" | "green" | "blue" | "alpha"
+export type ColorChannel = "red" | "green" | "blue" | "luminosity"
 
 export type HistogramDataObject = {[K in ColorChannel]: number}
 
@@ -58,7 +58,7 @@ export interface HistogramMachineSchema
         red: ChannelStateSchema<"red">;
         green: ChannelStateSchema<"green">;
         blue: ChannelStateSchema<"blue">;
-        alpha: ChannelStateSchema<"alpha">;
+        luminosity: ChannelStateSchema<"luminosity">;
       };
     };
     error: {};
@@ -109,7 +109,7 @@ const histogramMachine = Machine<
           red: channelState("red"),
           green: channelState("green"),
           blue: channelState("blue"),
-          alpha: channelState("alpha"),
+          luminosity: channelState("luminosity"),
         },
         on: {
           CHECK: {
@@ -117,7 +117,7 @@ const histogramMachine = Machine<
               "idle.red.checked",
               "idle.green.checked",
               "idle.blue.checked",
-              "idle.alpha.checked",
+              "idle.luminosity.checked",
             ],
           },
           UNCHECK: {
@@ -125,7 +125,7 @@ const histogramMachine = Machine<
               "idle.red.unchecked",
               "idle.green.unchecked",
               "idle.blue.unchecked",
-              "idle.alpha.unchecked",
+              "idle.luminosity.unchecked",
             ],
           },
         },
@@ -140,6 +140,7 @@ const histogramMachine = Machine<
     actions: {
       setData,
       logError,
+      toggleChannel,
     },
   },
 )

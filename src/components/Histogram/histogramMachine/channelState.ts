@@ -1,10 +1,30 @@
-import {EventObject, StateNodeConfig, StateSchema} from "xstate"
+import {ActionFunction, EventObject, StateNodeConfig, StateSchema} from "xstate"
 
 import {
   ColorChannel,
   HistogramMachineContext,
   HistogramMachineEvent,
 } from "./index"
+
+// #region ACTION IMPLEMENTATIONS
+
+const channelRefs: {[K in ColorChannel]?: SVGPathElement} = {}
+
+export const toggleChannel: ActionFunction<
+  HistogramMachineContext,
+  ChannelCheckEvent<ColorChannel>
+> = (_context, _event, {action}) => {
+  const {channel, display} = (action as unknown) as {
+    channel: ColorChannel;
+    display: "none" | null;
+  }
+  if (!channelRefs[channel]) {
+    channelRefs[channel] = (document.getElementById(
+      channel,
+    ) as unknown) as SVGPathElement
+  }
+  channelRefs[channel].style.display = display
+}
 
 // #region TYPES
 
@@ -26,8 +46,8 @@ interface ChannelCheckEvent<T extends ColorChannel> extends EventObject {
     ? "GREEN.CHECK" | "GREEN.UNCHECK"
     : T extends "blue"
     ? "BLUE.CHECK" | "BLUE.UNCHECK"
-    : T extends "alpha"
-    ? "ALPHA.CHECK" | "ALPHA.UNCHECK"
+    : T extends "luminosity"
+    ? "LUMINOSITY.CHECK" | "LUMINOSITY.UNCHECK"
     : unknown;
 }
 
@@ -52,10 +72,20 @@ function channelState<T extends ColorChannel> (
         on: {
           [channel.toUpperCase() + ".UNCHECK"]: "unchecked",
         },
+        onEntry: {
+          type: "toggleChannel",
+          display: null,
+          channel,
+        },
       },
       unchecked: {
         on: {
-          [channel.toUpperCase() + ".UNCHECK"]: "checked",
+          [channel.toUpperCase() + ".CHECK"]: "checked",
+        },
+        onEntry: {
+          type: "toggleChannel",
+          display: "none",
+          channel,
         },
       },
     },

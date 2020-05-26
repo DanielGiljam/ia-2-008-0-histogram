@@ -1,8 +1,21 @@
+import blue from "@material-ui/core/colors/blue"
+import green from "@material-ui/core/colors/green"
+import grey from "@material-ui/core/colors/grey"
+import red from "@material-ui/core/colors/red"
+
 import * as d3 from "d3"
 
+const margins = {left: 36, bottom: 20}
+let rect
+const blendMode = "normal"
+const opacity = 1
+const luminosityBlendMode = blendMode
+const luminosityOpacity = opacity
+
 function drawHistogram (data) {
-  const margins = {left: 36, bottom: 20}
-  const rect = document.getElementById("histogram").getBoundingClientRect()
+  if (!rect) {
+    rect = document.getElementById("histogram").getBoundingClientRect()
+  }
 
   const height = rect.height - margins.bottom
   const width = rect.width - margins.left
@@ -14,7 +27,9 @@ function drawHistogram (data) {
     .attr("height", "100%")
     .append("g")
     .attr("transform", `translate(${margins.left},0)`)
+    .attr("style", "isolation: isolate")
 
+  // TODO: find a way to avoid doing data.shift()
   data.shift()
 
   const r = []
@@ -31,10 +46,7 @@ function drawHistogram (data) {
 
   const yScale = d3
     .scaleLinear()
-    .domain([
-      d3.min([d3.min(r), d3.min(g), d3.min(b), d3.min(l)]),
-      d3.max([d3.max(r), d3.max(g), d3.max(b), d3.max(l)]),
-    ])
+    .domain([d3.min(l), d3.max(l)])
     .range([height, 0])
   const xScale = d3.scaleLinear().domain([0, data.length]).range([0, width])
   const area = d3
@@ -52,22 +64,32 @@ function drawHistogram (data) {
 
   svg
     .append("path")
-    .attr("fill", "red")
-    .style("opacity", 0.5)
-    .attr("d", area(r))
     .attr("id", "red")
+    .attr("fill", red.A700)
+    .attr("d", area(r))
+    .style("mix-blend-mode", blendMode)
+    .style("opacity", opacity)
   svg
     .append("path")
-    .attr("fill", "green")
-    .style("opacity", 0.5)
-    .attr("d", area(g))
     .attr("id", "green")
+    .attr("fill", green.A700)
+    .attr("d", area(g))
+    .style("mix-blend-mode", blendMode)
+    .style("opacity", opacity)
   svg
     .append("path")
-    .attr("fill", "blue")
-    .style("opacity", 0.5)
-    .attr("d", area(b))
     .attr("id", "blue")
+    .attr("fill", blue.A700)
+    .attr("d", area(b))
+    .style("mix-blend-mode", blendMode)
+    .style("opacity", opacity)
+  svg
+    .append("path")
+    .attr("id", "luminosity")
+    .attr("fill", grey[700])
+    .attr("d", area(l))
+    .style("mix-blend-mode", luminosityBlendMode)
+    .style("opacity", luminosityOpacity)
 
   svg.append("g").call(yAxis)
   svg.append("g").call(xAxis).attr("transform", `translate(0,${height})`)

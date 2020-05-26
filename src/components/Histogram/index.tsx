@@ -1,12 +1,17 @@
-import {useEffect} from "react"
+import {ReactNode, useEffect} from "react"
 
 import {useMachine} from "@xstate/react"
 
-import {CircularProgress, Typography} from "@material-ui/core"
+import Checkbox from "@material-ui/core/Checkbox"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import Divider from "@material-ui/core/Divider"
+import FormControl from "@material-ui/core/FormControl"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import FormGroup from "@material-ui/core/FormGroup"
+import FormLabel from "@material-ui/core/FormLabel"
+import Typography from "@material-ui/core/Typography"
 
 import {Theme, createStyles, makeStyles} from "@material-ui/core/styles"
-
-import {Line, LineChart, ResponsiveContainer, Tooltip, YAxis} from "recharts"
 
 import {breakpoint as bp} from "../../theme/constants"
 
@@ -17,7 +22,6 @@ const useStyles = makeStyles((theme: Theme) =>
     histogram: {
       alignItems: "center",
       display: "flex",
-      flexDirection: "column",
       flexGrow: 1,
       justifyContent: "center",
       minHeight: theme.breakpoints.values[bp] * 0.2,
@@ -33,6 +37,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const errorMessage =
   "Encountered unknown error when generating histogram data. See console for more information."
+
+const colorChannels = ["red", "green", "blue", "luminosity"]
 
 interface HistogramProps {
   imageData?: ImageData;
@@ -53,7 +59,62 @@ function Histogram ({imageData}: HistogramProps): JSX.Element {
       contents = <Typography>{errorMessage}</Typography>
       break
     default:
-      contents = undefined
+      contents = (
+        <form>
+          <FormControl component={"fieldset"}>
+            <FormLabel component={"legend"}>Color Channels</FormLabel>
+            <FormGroup>
+              {((): ReactNode => {
+                const states = colorChannels.map((colorChannel) =>
+                  state.matches(`idle.${colorChannel}.checked`),
+                )
+                const allChecked = states.every((state) => state)
+                const allUnchecked = states.every((state) => !state)
+                return [
+                  <FormControlLabel
+                    key={"all"}
+                    control={
+                      <Checkbox
+                        checked={allChecked}
+                        indeterminate={!allChecked && !allUnchecked}
+                        onChange={(): void => {
+                          send(allChecked ? "UNCHECK" : "CHECK")
+                        }}
+                      />
+                    }
+                    label={"All"}
+                  />,
+                  <Divider key={"divider"} />,
+                  ...colorChannels.map((colorChannel, index) => {
+                    const checked = states[index]
+                    const label = colorChannel.replace(/^./, (match) =>
+                      match.toUpperCase(),
+                    )
+                    return (
+                      <FormControlLabel
+                        key={label}
+                        control={
+                          <Checkbox
+                            checked={checked}
+                            onChange={(): void => {
+                              send(
+                                `${colorChannel.toUpperCase()}.${
+                                  checked ? "UNCHECK" : "CHECK"
+                                }`,
+                              )
+                            }}
+                          />
+                        }
+                        label={label}
+                      />
+                    )
+                  }),
+                ]
+              })()}
+            </FormGroup>
+          </FormControl>
+        </form>
+      )
   }
   return (
     <div className={styles.histogram}>
