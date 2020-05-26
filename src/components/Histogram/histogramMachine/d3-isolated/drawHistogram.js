@@ -1,6 +1,6 @@
 import * as d3 from "d3"
 
-function drawHistogram (data, state) {
+function drawHistogram (data) {
   const margins = {left: 36, bottom: 20}
   const rect = document.getElementById("histogram").getBoundingClientRect()
 

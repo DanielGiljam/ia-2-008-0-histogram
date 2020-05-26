@@ -20,14 +20,6 @@ export interface DataEvent extends EventObject {
   data: Uint8ClampedArray;
 }
 
-// TODO: actually implement this
-const state = {
-  red: true,
-  green: true,
-  blue: true,
-  luminosity: true,
-}
-
 const generateHistogram: InvokeCreator<
   HistogramMachineContext,
   DataEvent
@@ -42,7 +34,7 @@ const generateHistogram: InvokeCreator<
       histogramData[data[i + j]][key]++
     })
   }
-  drawHistogram(histogramData, state)
+  drawHistogram(histogramData)
   return histogramData
 }
 
