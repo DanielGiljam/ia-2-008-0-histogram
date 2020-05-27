@@ -34,7 +34,7 @@ const generateHistogram: InvokeCreator<
       histogramData[data[i + j]][key]++
     })
   }
-  drawHistogram(histogramData)
+  setTimeout(() => drawHistogram(histogramData))
   return histogramData
 }
 

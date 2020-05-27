@@ -1,6 +1,7 @@
 import {ReactNode, useEffect} from "react"
 
 import {useMachine} from "@xstate/react"
+import {State} from "xstate"
 
 import Checkbox from "@material-ui/core/Checkbox"
 import CircularProgress from "@material-ui/core/CircularProgress"
@@ -15,17 +16,25 @@ import {Theme, createStyles, makeStyles} from "@material-ui/core/styles"
 
 import {breakpoint as bp} from "../../theme/constants"
 
-import histogramMachine from "./histogramMachine"
+import histogramMachine, {
+  HistogramMachineContext,
+  HistogramMachineEvent,
+} from "./histogramMachine"
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles<
+  Theme,
+  State<HistogramMachineContext, HistogramMachineEvent>
+>((theme) =>
   createStyles({
     histogram: {
       alignItems: "center",
       display: "flex",
-      flexGrow: 1,
+      flexGrow: ({value}): number => (value !== "deactivated" ? 1 : 0),
       justifyContent: "center",
-      minHeight: theme.breakpoints.values[bp] * 0.2,
-      padding: theme.spacing(3),
+      minHeight: ({value}): number =>
+        value !== "deactivated" ? theme.breakpoints.values[bp] * 0.2 : 0,
+      padding: ({value}): number =>
+        value !== "deactivated" ? theme.spacing(3) : 0,
       width: "100%",
       "& > #histogram": {
         height: "100%",
@@ -45,13 +54,16 @@ interface HistogramProps {
 }
 
 function Histogram ({imageData}: HistogramProps): JSX.Element {
-  const styles = useStyles()
   const [state, send] = useMachine(histogramMachine)
+  const styles = useStyles(state)
   useEffect(() => {
     if (imageData) send({type: "DATA", data: imageData.data})
   }, [imageData])
   let contents: JSX.Element
   switch (state.value) {
+    case "deactivated":
+      contents = undefined
+      break
     case "loading":
       contents = <CircularProgress disableShrink />
       break

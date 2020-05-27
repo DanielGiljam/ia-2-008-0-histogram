@@ -8,8 +8,6 @@ import {
 
 // #region ACTION IMPLEMENTATIONS
 
-const channelRefs: {[K in ColorChannel]?: SVGPathElement} = {}
-
 export const toggleChannel: ActionFunction<
   HistogramMachineContext,
   ChannelCheckEvent<ColorChannel>
@@ -18,12 +16,10 @@ export const toggleChannel: ActionFunction<
     channel: ColorChannel;
     display: "none" | null;
   }
-  if (!channelRefs[channel]) {
-    channelRefs[channel] = (document.getElementById(
-      channel,
-    ) as unknown) as SVGPathElement
+  const channelRef = document.getElementById(channel)
+  if (channelRef) {
+    channelRef.style.display = display
   }
-  channelRefs[channel].style.display = display
 }
 
 // #region TYPES

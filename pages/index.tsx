@@ -1,5 +1,3 @@
-import React, {useEffect} from "react"
-
 import {useMachine} from "@xstate/react"
 
 import Button from "@material-ui/core/Button"
@@ -11,7 +9,6 @@ import ErrorMessageSnackbar from "../src/components/ErrorMessageSnackbar"
 import Histogram from "../src/components/Histogram"
 import stateMachine from "../src/stateMachine"
 import {inputLabelButtonHeight as bh} from "../src/theme/constants"
-import fetchPicture from "../test/fetchPicture"
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -30,12 +27,6 @@ const useStyles = makeStyles(() =>
 function Index (): JSX.Element {
   const styles = useStyles()
   const [state, send] = useMachine(stateMachine)
-  useEffect(() => {
-    // REMOVE BEFORE PRODUCTION!
-    fetchPicture().then((picture) =>
-      send({type: "FILES", acceptedFiles: [picture], fileRejections: []}),
-    )
-  }, [])
   return (
     <main className={state.context.imageData ? styles.noPadding : undefined}>
       <DropzoneAndPicturePreview send={send} state={state} />
