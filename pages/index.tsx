@@ -1,4 +1,4 @@
-import {useEffect} from "react"
+import React, {useEffect} from "react"
 
 import {useMachine} from "@xstate/react"
 
@@ -50,7 +50,7 @@ function Index (): JSX.Element {
           ? "Load a picture"
           : "Or load a picture manually"}
       </Button>
-      {state.context.imageData ? <Histogram /> : undefined}
+      <Histogram imageData={state.context.imageData} />
       <ErrorMessageSnackbar
         isShown={!!state.context.errorMessage}
         message={
